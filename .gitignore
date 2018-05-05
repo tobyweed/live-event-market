@@ -1,7 +1,3 @@
 venv/
 
-<<<<<<< HEAD
 __pycache__/
-=======
-__pychache__/
->>>>>>> upstream/master
