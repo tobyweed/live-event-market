@@ -1,7 +1,7 @@
-venv/
+venv
 
-<<<<<<< HEAD
-__pycache__/
-=======
-__pychache__/
->>>>>>> upstream/master
+__pycache__
+
+node_modules
+
+.DS_Store
