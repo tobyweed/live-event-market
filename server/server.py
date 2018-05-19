@@ -1,7 +1,12 @@
 import os
-from flask import Flask, render_template, send_from_directory, jsonify
+from flask import Flask, jsonify
 
 app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+
+@app.route('/')
+def index():
+    return jsonify({'message': 'Hello, World!'})
 
 @app.route('/yo')
 def yo():

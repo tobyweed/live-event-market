@@ -1,4 +1,12 @@
+# dependencies
 node_modules
+
+# environment
 venv
+serverenv
+.env
+
+#misc
 __pycache__
 .DS_Store
+*.pyc
