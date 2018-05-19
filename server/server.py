@@ -10,7 +10,7 @@ def index():
 
 @app.route('/yo')
 def yo():
-    return 'yo'
+    return 'aye'
 
 if __name__ == '__main__':
     app.run()
