@@ -9,6 +9,10 @@ serverenv
 # production
 /build
 
+# database
+db
+*.db
+
 #misc
 __pycache__
 .DS_Store
