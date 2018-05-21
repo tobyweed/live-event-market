@@ -2,7 +2,9 @@ import os
 from flask import Flask, jsonify
 from flask_restful import Api
 from models import db #Necessary to do it this way to avoid circular imports
+
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__) #initialize Flask app
@@ -22,6 +24,7 @@ jwt = JWTManager(app)
 #create all db tables
 @app.before_first_request
 def create_tables():
+    from models import UserModel, RevokedTokenModel
     db.create_all()
 
 #support jwt blacklisting for logouts
