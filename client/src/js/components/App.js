@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import AuthService from './Auth/AuthService';
+import About from './About';
 import '../../css/App.css';
 
 class App extends Component {
@@ -25,6 +26,7 @@ class App extends Component {
 			<div>
 				<div className="App">APP</div>
 				<p> {loggedIn} </p>
+				<About />
 			</div>
 		);
 	}
