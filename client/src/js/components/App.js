@@ -1,31 +1,30 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import AuthService from './Auth/AuthService';
 import '../../css/App.css';
 
 class App extends Component {
+	constructor() {
+		super();
+		this.Auth = new AuthService();
+	}
+
 	state = {
-		yo: 'hi'
+		loggedIn: 'false'
 	};
 
 	componentDidMount() {
-		axios
-			.get('/yo')
-			.then(res => {
-				const yo = res.data;
-				this.setState({ yo });
-			})
-			.catch(error => {
-				console.log('Error fetching and parsing data', error);
-			});
+		if (this.Auth.loggedIn()) {
+			this.setState({ loggedIn: 'true' });
+		}
 	}
 
 	render() {
-		const { yo } = this.state;
+		const { loggedIn } = this.state;
 		return (
 			<div>
 				<div className="App">APP</div>
-				<p> {yo} </p>
+				<p> {loggedIn} </p>
 			</div>
 		);
 	}
