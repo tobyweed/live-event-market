@@ -17,6 +17,9 @@ class App extends Component {
 		yo: 'hi'
 	};
 
+
+//Working on setting auth headers to access protected data from the
+//db rn, so ignore this method for now. This whole file is a bit of a WIP
 	componentDidMount() {
 		if (this.Auth.loggedIn()) {
 			this.setState({ loggedIn: 'true' });
