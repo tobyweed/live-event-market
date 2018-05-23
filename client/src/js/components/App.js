@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import AuthService from './Auth/AuthService';
+import AuthService from '../utils/auth/AuthService';
 import About from './ChildComponents/Home/About';
 import '../../css/App.css';
 
