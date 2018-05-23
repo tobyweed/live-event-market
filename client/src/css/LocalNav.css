@@ -1,0 +1,41 @@
+ul.navbar {
+	display: table-row;
+	height: 10vh;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+li.navbar {
+	height: 100%;
+	padding: 0vh 2vh;
+}
+div.navbar {
+	/* changes with font!!! carefully test */
+	margin-top: 2.9vh;
+}
+img.navbar {
+	height: 6vh;
+	width: auto;
+	padding: 2vh 0;
+}
+.left {
+	float: left;
+}
+.right {
+	float: right;
+}
+.fixed {
+	background-color: rgba(53, 53, 53, 0.9);
+	/* Modiy alpha to be 51x3 with DCP on mac */
+	position: fixed;
+	z-index: 1;
+}
+.absolute {
+	background-color: #333;
+	position: absolute;
+}
+.nav_spacer {
+	background-color: #222;
+	height: 10vh;
+}
