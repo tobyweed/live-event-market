@@ -17,7 +17,10 @@ import Home from './js/components/MasterComponents/Home.js';
 ReactDOM.render(
 	<Router>
 		<div>
-			<Route path="/" component={Home} />
+			<Nav />
+			<Route exact path="/" component={Home} />
+			<Route path="/app" component={App} />
+			<Route path="/login" component={LoginForm} />
 		</div>
 	</Router>,
 

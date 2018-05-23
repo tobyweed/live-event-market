@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import AuthService from '../utils/auth/AuthService';
-import About from './ChildComponents/Home/About';
 import '../../css/App.css';
+
+import AuthService from '../utils/auth/AuthService';
+import withAuth from '../utils/auth/withAuth';
+const Auth = new AuthService();
 
 class App extends Component {
 	constructor() {
@@ -11,25 +13,53 @@ class App extends Component {
 	}
 
 	state = {
-		loggedIn: 'false'
+		loggedIn: 'false',
+		yo: 'hi'
 	};
 
 	componentDidMount() {
 		if (this.Auth.loggedIn()) {
 			this.setState({ loggedIn: 'true' });
+			// this.Auth.setHeader();
+			axios.defaults.headers.common['Authorization'] = this.Auth.getAccess();
+			axios.get('/yo').then(res => {
+				this.setState({ yo: 'yoooooo' });
+				console.log('ah yea');
+			});
 		}
 	}
 
 	render() {
-		const { loggedIn } = this.state;
+		const { loggedIn, yo } = this.state;
 		return (
 			<div>
 				<div className="App">APP</div>
-				<p> {loggedIn} </p>
-				<About />
+				<div className="App">
+					<div className="App-header">
+						<h2>
+							Welcome {this.props.user.identity} & {yo}
+						</h2>
+					</div>
+					<p className="App-intro">
+						<button
+							type="button"
+							className="form-submit"
+							onClick={this.handleLogout.bind(this)}
+						>
+							Logout
+						</button>
+					</p>
+				</div>
+
+				<div />
 			</div>
 		);
 	}
+
+	handleLogout() {
+		Auth.logout();
+		this.props.history.replace('/login');
+	}
 }
 
-export default App;
+export default withAuth(App);

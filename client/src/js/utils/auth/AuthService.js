@@ -1,6 +1,8 @@
 import axios from 'axios';
 import decode from 'jwt-decode';
 
+//This class handles client-side auth logic
+
 class AuthService {
 	login(username, password) {
 		return axios
@@ -74,7 +76,7 @@ class AuthService {
 	}
 
 	getProfile() {
-		return decode(this.getToken());
+		return decode(this.getAccess());
 	}
 
 	setHeader() {
@@ -86,7 +88,7 @@ class AuthService {
 			axios
 				.post('/token/refresh', {
 					headers: {
-						Authorization: 'Bearer ${refresh}'
+						'Authorization': 'Bearer ${refresh}'
 					}
 				})
 				.then(res => {

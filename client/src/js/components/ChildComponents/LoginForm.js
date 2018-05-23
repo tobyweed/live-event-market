@@ -10,6 +10,13 @@ class LoginForm extends Component {
 		this.Auth = new AuthService();
 	}
 
+	componentWillMount() {
+		//Redirect if we are already logged in
+		if (this.Auth.loggedIn()) {
+			this.props.history.replace('/');
+		}
+	}
+
 	render() {
 		return (
 			<div>
@@ -43,6 +50,7 @@ class LoginForm extends Component {
 	}
 
 	handleFormSubmit(e) {
+		//Login on form submit
 		e.preventDefault();
 
 		this.Auth.login(this.state.username, this.state.password)

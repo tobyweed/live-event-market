@@ -9,7 +9,7 @@ class LocalNav extends Component {
 			<div className="frontpage">
 				<div className="video">
 					<div className="video_content">
-						<img className="video_content" src={videoimg} />
+						<img className="video_content" src={videoimg} alt="video" />
 					</div>
 				</div>
 				<div className="intro">
