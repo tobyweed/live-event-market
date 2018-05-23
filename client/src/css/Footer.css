@@ -1,20 +1,23 @@
-.banner {
-	background: linear-gradient(#222, #333, #333, #333, #333, #222);
-	height: 50vh;
+.footer {
+	background-color: #fff;
+	color: #333;
+	display: grid;
+	grid-template-areas: 'footer_company footer_company footer_links footer_email';
+	grid-template-columns: 25% 25% 20% 30%;
+	height: 30vh;
+	width: 80;
 	margin: 0;
-	padding: 0;
-	width: 100%;
+	padding: 0 10vw;
 }
-img.banner {
-	border: 3px solid #666;
-	border-radius: 100%;
-	height: 25vh;
-	margin: 0;
-	padding: 0;
-	width: 25vh;
+.footer_company {
+	grid-area: footer_company;
+	padding: 2vh;
 }
-.banner_wrapper {
-	float: left;
-	padding: 12.5vh 5vh;
-	text-align: center;
+.footer_links {
+	grid-area: footer_links;
+	padding: 2vh;
+}
+.footer_email {
+	grid-area: footer_email;
+	padding: 2vh;
 }

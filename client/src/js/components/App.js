@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import AuthService from './Auth/AuthService';
-import About from './About';
+import About from './ChildComponents/Home/About';
 import '../../css/App.css';
 
 class App extends Component {

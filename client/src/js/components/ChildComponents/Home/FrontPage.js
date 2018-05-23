@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import '../../css/FrontPage.css';
-import videoimg from '../../images/video.png';
+import '../../../../css/FrontPage.css';
+import videoimg from '../../../../images/video.png';
 
-class LocalNav extends Component {
+class FrontPage extends Component {
 	render() {
 		return (
 			<div className="frontpage">
@@ -65,3 +65,5 @@ class LocalNav extends Component {
 		);
 	}
 }
+
+export default FrontPage;

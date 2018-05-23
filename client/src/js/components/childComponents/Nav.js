@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import '../../../css/Nav.css';
+import '../../../css/GlobalNav.css';
 import master_logo from '../../../images/master_logo.png';
-import master_logo from '../../../images/blank_prof.png';
+import blank_prof from '../../../images/blank_prof.png';
 
 class Nav extends Component {
 	render() {
@@ -11,12 +11,12 @@ class Nav extends Component {
 				<ul className="navbar fixed">
 					<li className="navbar left">
 						<Link to="/home">
-							<img className="navbar" src="master_logo" />
+							<img className="navbar" src={master_logo} />
 						</Link>
 					</li>
 					<li className="navbar right">
 						<Link to="/home">
-							<img className="navbar" src="blank_prof" />
+							<img className="navbar" src={blank_prof} />
 						</Link>
 					</li>
 					<li className="navbar right">

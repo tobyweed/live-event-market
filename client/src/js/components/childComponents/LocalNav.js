@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import '../../../css/LocalNav.css';
 
 class LocalNav extends Component {
 	render() {

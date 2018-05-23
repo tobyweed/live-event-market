@@ -1,22 +1,23 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 //import master components
-import  Nav from '../childComponents/Nav.js';
-import  FrontPage from '../childComponents/FrontPage.js';
-import  About from '../childComponents/About.js';
-import  Footer from '../childComponents/Footer.js';
+import Nav from '../ChildComponents/Nav.js';
+import FrontPage from '../ChildComponents/Home/FrontPage.js';
+import About from '../ChildComponents/Home/About.js';
+import Footer from '../ChildComponents/Footer.js';
 
-class Home extends Component{
-render() {
-	return (
-		<div>
-		<Nav></Nav>
-		<FrontPage></FrontPage>
-		<About></About>
-		<Footer></Footer>
-		</div>
-	);}
+class Home extends Component {
+	render() {
+		return (
+			<div>
+				<Nav />
+				<FrontPage />
+				<About />
+				<Footer />
+			</div>
+		);
+	}
 }
 export default Home;
