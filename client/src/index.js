@@ -7,15 +7,27 @@ import LoginForm from './js/components/Auth/LoginForm';
 import Nav from './js/components/Nav/Nav';
 import registerServiceWorker from './registerServiceWorker';
 
+//import master components
+import Home from './js/components/masterComponents/Home.js';
+//import _search from './components/masterComponents/search';
+//import _event from './components/masterComponents/event';
+//import _user from './components/masterComponents/user';
+//import _promoter from './components/masterComponents/promoter';
+
+
 ReactDOM.render(
 	<Router>
 		<div>
-			<Nav />
-			<Route exact path="/" component={App} />
-			<Route exact path="/login" component={LoginForm} />
+			<Route path="/" component={Home} />
+
 		</div>
 	</Router>,
 
 	document.getElementById('root')
 );
 registerServiceWorker();
+
+//<Route path="/Search" component={_search} />
+//<Route path="/Event" component={_event} />
+//<Route path="/User" component={_user} />
+//<Route path="/Pomoter" component={_promoter} />
