@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './css/index.css';
 import App from './js/components/App';
-import LoginForm from './js/components/Auth/LoginForm';
+import LoginForm from './js/components/ChildComponents/LoginForm';
 import Nav from './js/components/ChildComponents/Nav';
 import registerServiceWorker from './registerServiceWorker';
 
