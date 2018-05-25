@@ -10,13 +10,17 @@ class Nav extends Component {
 			<div>
 				<ul className="navbar fixed">
 					<li className="navbar left">
-						<Link to="/home">
-							<img className="navbar" src={master_logo} />
+						<Link to="/app">
+							<img className="navbar" src={master_logo} alt="logo" />
 						</Link>
 					</li>
 					<li className="navbar right">
-						<Link to="/home">
-							<img className="navbar" src={blank_prof} />
+						<Link to="/login">
+							<img
+								className="navbar"
+								src={blank_prof}
+								alt="blank profile icon"
+							/>
 						</Link>
 					</li>
 					<li className="navbar right">

@@ -8,8 +8,8 @@ class Footer extends Component {
 		return (
 			<div>
 				<hr />
-				<div class="footer">
-					<div class="footer_company">
+				<div className="footer">
+					<div className="footer_company">
 						<h5>COMPANY</h5>First Tube Media brings the live events industy
 						together and amplifies the reach of every show. Its platform enables
 						artists, event creators, and sponsors to find each other while their
@@ -17,24 +17,24 @@ class Footer extends Component {
 						online exposure.
 					</div>
 
-					<div class="footer_links">
+					<div className="footer_links">
 						<h5>ABOUT</h5>Platform<br />Services<br />Partners<br />Case Studies<br />team<br />Contact
 					</div>
 
-					<div class="footer_email">
+					<div className="footer_email">
 						<h5>KEEP IN TOUCH</h5>
 						<p>
 							Stay up to date on trending artists, upcoming events, and more...
 						</p>
 						<form>
 							<input
-								class="button_plain form_search"
+								className="button_plain form_search"
 								type="text"
 								name="email"
 								placeholder="Your Email..."
 							/>
 							<input
-								class="button_color form_submit"
+								className="button_color form_submit"
 								type="submit"
 								value="Subscribe"
 							/>

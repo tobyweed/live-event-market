@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import AuthService from './AuthService';
+import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
 
 class LoginForm extends Component {
@@ -8,6 +8,13 @@ class LoginForm extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 		this.Auth = new AuthService();
+	}
+
+	componentWillMount() {
+		//Redirect if we are already logged in
+		if (this.Auth.loggedIn()) {
+			this.props.history.replace('/');
+		}
 	}
 
 	render() {
@@ -43,6 +50,7 @@ class LoginForm extends Component {
 	}
 
 	handleFormSubmit(e) {
+		//Login on form submit
 		e.preventDefault();
 
 		this.Auth.login(this.state.username, this.state.password)

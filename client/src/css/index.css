@@ -1,5 +1,6 @@
 body {
 	color: #fff;
+	background-color: rgb(230, 230, 230);
 	font-family: 'Open Sans', sans-serif;
 	font-weight: lighter;
 	margin: 0;
@@ -11,7 +12,7 @@ a {
 }
 input {
 	border: none;
-	color: #fff;
+	/* color: #fff; */
 	font-family: 'Open Sans', sans-serif;
 	font-weight: lighter;
 	outline: none;
