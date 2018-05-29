@@ -20,7 +20,7 @@ class LoginForm extends Component {
 	render() {
 		return (
 			<div>
-				<h1>Login</h1>
+				<h1 className="login-form">Login</h1>
 				<form onSubmit={this.handleFormSubmit}>
 					<input
 						className="form-item"

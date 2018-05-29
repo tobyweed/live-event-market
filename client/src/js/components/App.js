@@ -4,7 +4,6 @@ import '../../css/App.css';
 
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
-const Auth = new AuthService();
 
 class App extends Component {
 	constructor() {
@@ -13,34 +12,25 @@ class App extends Component {
 	}
 
 	state = {
-		loggedIn: 'false',
 		yo: 'hi'
 	};
 
-
-//Working on setting auth headers to access protected data from the
-//db rn, so ignore this method for now. This whole file is a bit of a WIP
 	componentDidMount() {
-		if (this.Auth.loggedIn()) {
-			this.setState({ loggedIn: 'true' });
-			// this.Auth.setHeader();
-			axios.defaults.headers.common['Authorization'] = this.Auth.getAccess();
-			axios.get('/yo').then(res => {
-				this.setState({ yo: 'yoooooo' });
-				console.log('ah yea');
-			});
-		}
+		axios.get('/yo').then(res => {
+			this.setState({ yo: res.data.answer });
+		});
 	}
 
+	//& {yo}
 	render() {
-		const { loggedIn, yo } = this.state;
+		const { yo } = this.state;
 		return (
 			<div>
 				<div className="App">APP</div>
 				<div className="App">
 					<div className="App-header">
 						<h2>
-							Welcome {this.props.user.identity} & {yo}
+							Welcome {this.props.user.identity} && {yo}
 						</h2>
 					</div>
 					<p className="App-intro">
@@ -60,7 +50,7 @@ class App extends Component {
 	}
 
 	handleLogout() {
-		Auth.logout();
+		this.Auth.logout();
 		this.props.history.replace('/login');
 	}
 }
