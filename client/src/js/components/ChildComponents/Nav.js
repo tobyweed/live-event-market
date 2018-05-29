@@ -24,7 +24,7 @@ class Nav extends Component {
 						</Link>
 					</li>
 					<li className="navbar right">
-						<Link to="/sign-up">
+						<Link to="/registration">
 							<div className="navbar button_color">Sign Up</div>
 						</Link>
 					</li>

@@ -17,6 +17,21 @@ class AuthService {
 			});
 	}
 
+	register(data) {
+		return axios
+			.post('/registration', {
+				username: data.username,
+				password: data.password,
+				firstName: data.firstName,
+				lastName: data.lastName
+			})
+			.then(res => {
+				this.setAccess(res.data.access_token);
+				this.setRefresh(res.data.refresh_token);
+				return Promise.resolve(res);
+			});
+	}
+
 	loggedIn() {
 		const token = this.getAccess();
 		return !!token && !this.isTokenExpired(token) && this.isTokenValid(token);
@@ -73,6 +88,7 @@ class AuthService {
 		// 	{ headers: {"Authorization" : `Bearer ${tokenStr}`} }
 		// );
 		localStorage.removeItem('id_access_token');
+		localStorage.removeItem('id_refresh_token');
 	}
 
 	getProfile() {

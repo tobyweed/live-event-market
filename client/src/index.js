@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './css/index.css';
 import App from './js/components/App';
 import LoginForm from './js/components/ChildComponents/LoginForm';
+import RegistrationForm from './js/components/ChildComponents/RegistrationForm';
 import Nav from './js/components/ChildComponents/Nav';
 import registerServiceWorker from './registerServiceWorker';
 
@@ -21,6 +22,7 @@ ReactDOM.render(
 			<Route exact path="/" component={Home} />
 			<Route path="/app" component={App} />
 			<Route path="/login" component={LoginForm} />
+			<Route path="/registration" component={RegistrationForm} />
 		</div>
 	</Router>,
 

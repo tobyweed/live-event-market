@@ -3,38 +3,30 @@ import AuthService from './AuthService';
 
 /*
 * This class is a Higher Order Component which is applied
-* to other components if you want them to have auth capabilities
+* to other components if you want them to be hidden if you're not logged in.
+*
+* Note that you should usually export this wrapping withAuth like:
+* "hidden(withAuth(component))" instead of the other way around
 *
 * TLDR use this if you want to make a view permissioned
 */
 
-export default function withAuth(AuthComponent) {
+export default function hidden(AuthComponent) {
 	return class AuthWrapped extends Component {
 		constructor() {
 			super();
-			this.state = {
-				user: null
-			};
 			this.Auth = new AuthService();
 		}
 
 		componentWillMount() {
-			this.Auth.tryAccess();
-			try {
-				const profile = this.Auth.getProfile();
-				this.setState({
-					user: profile
-				});
-			} catch (err) {
-				this.Auth.logout();
+			if (!this.Auth.loggedIn()) {
+				//If we are not logged in, redirect us to login
 				this.props.history.replace('/login');
 			}
 		}
 
 		render() {
-			return (
-				<AuthComponent history={this.props.history} user={this.state.user} />
-			);
+			return <AuthComponent history={this.props.history} />;
 		}
 	};
 }

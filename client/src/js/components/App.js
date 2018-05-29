@@ -4,6 +4,7 @@ import '../../css/App.css';
 
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
+import hidden from '../utils/auth/hidden';
 
 class App extends Component {
 	constructor() {
@@ -30,7 +31,9 @@ class App extends Component {
 				<div className="App">
 					<div className="App-header">
 						<h2>
-							Welcome {this.props.user.identity} && {yo}
+							{/*the code below only tries to return an identity if there is a user*/}
+							Welcome {!!this.props.user ? this.props.user.identity + ', ' : ''}
+							and {yo}
 						</h2>
 					</div>
 					<p className="App-intro">
@@ -55,4 +58,4 @@ class App extends Component {
 	}
 }
 
-export default withAuth(App);
+export default hidden(withAuth(App));
