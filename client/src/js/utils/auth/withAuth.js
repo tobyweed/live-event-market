@@ -10,28 +10,28 @@ import AuthService from './AuthService';
 */
 
 export default function withAuth(AuthComponent) {
-	const Auth = new AuthService();
 	return class AuthWrapped extends Component {
 		constructor() {
 			super();
 			this.state = {
 				user: null
 			};
+			this.Auth = new AuthService();
 		}
 
 		componentWillMount() {
-			//If we are not logged in, redirect us to login
-			if (!Auth.loggedIn()) {
+			this.Auth.tryAccess(); //set the access headers
+			if (!this.Auth.loggedIn()) { //If we are not logged in, redirect us to loginset the access headers
 				this.props.history.replace('/login');
 			} else {
 				//Otherwise, set the user in props
 				try {
-					const profile = Auth.getProfile();
+					const profile = this.Auth.getProfile();
 					this.setState({
 						user: profile
 					});
 				} catch (err) {
-					Auth.logout();
+					this.Auth.logout();
 					this.props.history.replace('/login');
 				}
 			}
