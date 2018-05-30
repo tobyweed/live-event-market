@@ -10,7 +10,7 @@ class Footer extends Component {
 				<hr />
 				<div className="footer">
 					<div className="footer_company">
-						<h5>COMPANY</h5>First Tube Media brings the live events industy
+						<h5>COMPANY</h5>First Tube Media brings the live events industry
 						together and amplifies the reach of every show. Its platform enables
 						artists, event creators, and sponsors to find each other while their
 						in house content creation and distribution services deliver endless

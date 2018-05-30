@@ -28,6 +28,7 @@ class LoginForm extends Component {
 						name="username"
 						type="text"
 						onChange={this.handleChange}
+						required
 					/>
 					<input
 						className="form-item"
@@ -35,6 +36,7 @@ class LoginForm extends Component {
 						name="password"
 						type="password"
 						onChange={this.handleChange}
+						required
 					/>
 					<input
 						className="form-item"
@@ -50,6 +52,38 @@ class LoginForm extends Component {
 						type="text"
 						onChange={this.handleChange}
 					/>
+					<br />
+					<input
+						className="form-item"
+						placeholder="Enter Email"
+						name="email"
+						type="email"
+						onChange={this.handleChange}
+						required
+					/>
+					<input
+						className="form-item"
+						placeholder="Enter Phone Number"
+						name="phoneNumber"
+						type="text"
+						onChange={this.handleChange}
+					/>
+					{/* This is temporary. It will be an upload input once we deal with image handling*/}
+					<input
+						className="form-item"
+						placeholder="Profile Image Url"
+						name="proPic"
+						type="text"
+						onChange={this.handleChange}
+					/>
+					<input
+						className="form-item"
+						placeholder="Your Organization"
+						name="organization"
+						type="text"
+						onChange={this.handleChange}
+					/>
+					<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
 				<p />

@@ -13,7 +13,10 @@ class UserModel(db.Model):
     password = db.Column(db.String(120), nullable = False)
     firstName = db.Column(db.String(120))
     lastName = db.Column(db.String(120))
-
+    email = db.Column(db.String(120))
+    phoneNumber = db.Column(db.String(120))
+    proPic = db.Column(db.String(120))
+    organization = db.Column(db.String(120))
 
     def save_to_db(self):
         db.session.add(self)

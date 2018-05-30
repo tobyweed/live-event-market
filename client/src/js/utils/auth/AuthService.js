@@ -23,7 +23,11 @@ class AuthService {
 				username: data.username,
 				password: data.password,
 				firstName: data.firstName,
-				lastName: data.lastName
+				lastName: data.lastName,
+				email: data.email,
+				phoneNumber: data.phoneNumber,
+				proPic: data.proPic,
+				organization: data.organization
 			})
 			.then(res => {
 				this.setAccess(res.data.access_token);

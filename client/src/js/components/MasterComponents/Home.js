@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-//import master components
-// import Nav from '../ChildComponents/Nav.js';
-import FrontPage from '../ChildComponents/Home/FrontPage.js';
-import About from '../ChildComponents/Home/About.js';
-import Footer from '../ChildComponents/Footer.js';
+import FrontPage from '../ChildComponents/Home/FrontPage';
+import About from '../ChildComponents/Home/About';
 
 class Home extends Component {
 	render() {
@@ -14,7 +9,6 @@ class Home extends Component {
 			<div>
 				<FrontPage />
 				<About />
-				<Footer />
 			</div>
 		);
 	}
