@@ -3,7 +3,8 @@ from passlib.hash import pbkdf2_sha256 as sha256
 
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
 
-#The user
+
+#represents users
 class UserModel(db.Model):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
@@ -17,6 +18,9 @@ class UserModel(db.Model):
     phoneNumber = db.Column(db.String(120))
     proPic = db.Column(db.String(120))
     organization = db.Column(db.String(120))
+    promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
+
+    promoter = db.relationship("PromoterModel", back_populates="users")
 
     def save_to_db(self):
         db.session.add(self)
@@ -53,7 +57,33 @@ class UserModel(db.Model):
         return sha256.verify(password, hash)
 
 
-#Revoked token model
+class PromoterModel(db.Model):
+    __tablename__ = 'promoters'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(120), unique = True, nullable = False)
+
+    users = db.relationship("UserModel", order_by=UserModel.id, back_populates="promoter")
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @classmethod
+    def find_by_name(cls, name):
+       return cls.query.filter_by(name = name).first()
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'name': x.name
+            }
+        return {'users': list(map(lambda x: to_json(x), PromoterModel.query.all()))}
+
+
+
+#for when a user logs out, so we can disable their keys
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
     id = db.Column(db.Integer, primary_key = True)

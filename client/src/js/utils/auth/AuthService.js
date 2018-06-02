@@ -107,26 +107,6 @@ class AuthService {
 				'Bearer ' + this.getAccess();
 		}
 	}
-
-	/*This method should be called whenever a user tries to access a protected resource.
-If the user has a valid access token, it will set that as a header.
-If the user has no access token, but does have a refresh token, it will reset the tokens and set the access header.
-If the user has no tokens, the withAuth HOC will note that they are not logged in and will redirect them to login.
-*/
-	tryAccess() {
-		const refresh = this.getRefresh();
-		if (this.loggedIn()) {
-			this.setHeader();
-		} else if (!!refresh && !this.isTokenExpired(refresh)) {
-			axios.defaults.headers.common['Authorization'] = `Bearer ${refresh}`; //set the header to be the refresh token
-			axios.post('/token/refresh').then(res => {
-				//refresh access token
-				this.setAccess(res.data.access_token);
-				return Promise.resolve(res);
-			});
-			this.setHeader(); //set header back to access token
-		}
-	}
 }
 
 export default AuthService;
