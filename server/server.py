@@ -39,14 +39,15 @@ def index():
     return jsonify({'message': 'Hello, World!'})
 
 #configure Flask_RESTful api
-import models, auth, resources
-api.add_resource(auth.UserRegistration, '/registration')
-api.add_resource(auth.UserLogin, '/login')
-api.add_resource(auth.UserLogoutAccess, '/logout/access')
-api.add_resource(auth.UserLogoutRefresh, '/logout/refresh')
-api.add_resource(auth.TokenRefresh, '/token/refresh')
-api.add_resource(resources.AllUsers, '/users')
-api.add_resource(resources.SecretResource, '/yo')
+import models, endpoints
+api.add_resource(endpoints.UserRegistration, '/registration')
+api.add_resource(endpoints.UserLogin, '/login')
+api.add_resource(endpoints.UserLogoutAccess, '/logout/access')
+api.add_resource(endpoints.UserLogoutRefresh, '/logout/refresh')
+api.add_resource(endpoints.TokenRefresh, '/token/refresh')
+api.add_resource(endpoints.AllUsers, '/users')
+api.add_resource(endpoints.OneUser, '/user/<string:user>')
+api.add_resource(endpoints.SecretResource, '/yo')
 
 #run
 if __name__ == '__main__':
