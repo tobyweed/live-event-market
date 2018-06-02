@@ -24,7 +24,7 @@ jwt = JWTManager(app)
 #create all db tables
 @app.before_first_request
 def create_tables():
-    from models import UserModel, RevokedTokenModel
+    from models import UserModel, RevokedTokenModel, PromoterModel
     db.create_all()
 
 #support jwt blacklisting for logouts
@@ -47,6 +47,7 @@ api.add_resource(endpoints.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(endpoints.TokenRefresh, '/token/refresh')
 api.add_resource(endpoints.AllUsers, '/users')
 api.add_resource(endpoints.OneUser, '/user/<string:user>')
+api.add_resource(endpoints.PromoterRegistration, '/promoters/registration')
 api.add_resource(endpoints.SecretResource, '/yo')
 
 #run

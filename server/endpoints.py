@@ -1,8 +1,9 @@
 from flask_restful import Resource, request
-from models import UserModel, RevokedTokenModel
+from models import PromoterModel, UserModel, RevokedTokenModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from marshmallow import Schema, fields, post_load
 
+#declare schemas
 class UserSchema(Schema):
     username = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
     password = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
@@ -13,14 +14,31 @@ class UserSchema(Schema):
     proPic = fields.Str(missing=None)
     organization = fields.Str(missing=None)
 
+class PromoterSchema(Schema):
+    name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
 
+#initialize schemas
 user_schema = UserSchema()
+promoter_schema = PromoterSchema()
 
+
+'''
+================USER RESOURCES================
+'''
+#return one user's data.
+#can only be called by that user.
 class OneUser(Resource):
+    @jwt_required
     def get(self, user):
+        current_user = get_jwt_identity()
         result = UserModel.find_by_username(user)
-        return user_schema.dump(result)
 
+        if(user == current_user):
+            return user_schema.dump(result)
+        else:
+            return {'message': 'You are not authorized to access this information.'}
+
+#this is a development route, to be deleted later
 class AllUsers(Resource):
     def get(self):
         return UserModel.return_all()
@@ -28,6 +46,41 @@ class AllUsers(Resource):
     def delete(self):
         return UserModel.delete_all()
 
+
+'''
+================PROMOTER RESOURCES================
+'''
+#register a new promoter
+class PromoterRegistration(Resource):
+    @jwt_required
+    def post(self):
+        data = request.get_json()
+        promoter = promoter_schema.load(data)
+        if PromoterModel.find_by_name(promoter.data['name']):
+            return {'message': 'promoter {} already exists'. format(promoter.data['name'])}
+
+        new_promoter = PromoterModel(
+            name = promoter.data['name']
+        )
+
+        current_user = get_jwt_identity()
+        user = UserModel.find_by_username(current_user)
+        new_promoter.users.append(user)
+
+        try:
+            new_promoter.save_to_db()
+            return {
+                'message': 'Promoter {} was created'.format( promoter.data['name'])
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+
+
+'''
+================MISC RESOURCES================
+'''
+#secret resource for testing
 class SecretResource(Resource):
     @jwt_required
     def get(self):
@@ -37,6 +90,11 @@ class SecretResource(Resource):
 
 
 
+'''
+================AUTH RESOURCES================
+'''
+
+#register new user
 class UserRegistration(Resource):
     def post(self):
         data = request.get_json()
@@ -44,7 +102,6 @@ class UserRegistration(Resource):
         if UserModel.find_by_username(data['username']):
             return {'message': 'User {} already exists'. format(data['username'])}
 
-        print(user)
         new_user = UserModel(
             username = user.data['username'],
             password = UserModel.generate_hash(user.data['password']),
@@ -55,7 +112,7 @@ class UserRegistration(Resource):
             proPic = user.data['proPic'],
             organization = user.data['organization'],
         )
-        # new_user = UserModel(user.data)
+
         try:
             new_user.save_to_db()
             access_token = create_access_token(identity = data['username'])
@@ -68,7 +125,7 @@ class UserRegistration(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
-
+#log in with a username and password
 class UserLogin(Resource):
     def post(self):
         data = request.get_json()
@@ -89,6 +146,7 @@ class UserLogin(Resource):
             return {'message': 'Wrong credentials'}
 
 
+#THE BELOW ROUTES ARE NOT TESTED OR IMPLEMENTED ON THE CLIENT YET
 class UserLogoutAccess(Resource):
     @jwt_required
     def post(self):

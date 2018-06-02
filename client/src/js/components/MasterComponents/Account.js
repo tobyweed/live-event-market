@@ -6,6 +6,12 @@ import withAuth from '../../utils/auth/withAuth';
 import hidden from '../../utils/auth/hidden';
 
 class Account extends Component {
+	constructor() {
+		super();
+		this.handleChange = this.handleChange.bind(this);
+		this.handleFormSubmit = this.handleFormSubmit.bind(this);
+	}
+
 	state = {
 		userData: ''
 	};
@@ -32,11 +38,45 @@ class Account extends Component {
 						<li>{this.state.userData.phoneNumber}</li>
 						<li>{this.state.userData.organization}</li>
 					</ul>
+
+					<div className="promoter-registration">
+						<h1>Create a Promoter Account</h1>
+						<form onSubmit={this.handleFormSubmit}>
+							<input
+								className="form-item"
+								placeholder="Enter Promoter Name"
+								name="name"
+								type="text"
+								onChange={this.handleChange}
+							/>
+							<input className="form-submit" value="Submit" type="submit" />
+						</form>
+						<p />
+					</div>
 				</div>
 			);
 		} else {
 			return null;
 		}
+	}
+
+	handleChange(e) {
+		this.setState({
+			[e.target.name]: e.target.value
+		});
+	}
+
+	handleFormSubmit(e) {
+		//Login on form submit
+		e.preventDefault();
+
+		axios
+			.post('/promoters/registration', {
+				name: this.state.name
+			})
+			.catch(err => {
+				alert(err);
+			});
 	}
 }
 
