@@ -17,6 +17,11 @@ class App extends Component {
 	};
 
 	componentDidMount() {
+		//If we are not logged in, redirect us to login
+		if (!this.Auth.loggedIn()) {
+			this.props.history.replace('/login');
+		}
+
 		axios.get('/yo').then(res => {
 			this.setState({ yo: res.data.answer });
 		});
@@ -25,6 +30,7 @@ class App extends Component {
 	//& {yo}
 	render() {
 		const { yo } = this.state;
+		const user = this.props.user;
 		return (
 			<div>
 				<div className="App">APP</div>
@@ -58,4 +64,4 @@ class App extends Component {
 	}
 }
 
-export default hidden(withAuth(App));
+export default withAuth(App);

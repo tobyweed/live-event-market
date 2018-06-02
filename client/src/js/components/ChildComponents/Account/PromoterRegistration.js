@@ -50,4 +50,4 @@ class PromoterRegistration extends Component {
 	}
 }
 
-export default hidden(withAuth(PromoterRegistration));
+export default withAuth(PromoterRegistration);

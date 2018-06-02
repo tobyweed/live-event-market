@@ -5,11 +5,12 @@ import PromoterRegistration from '../ChildComponents/Account/PromoterRegistratio
 import Promoter from '../ChildComponents/Account/Promoter';
 
 import withAuth from '../../utils/auth/withAuth';
-import hidden from '../../utils/auth/hidden';
+import AuthService from '../../utils/auth/AuthService';
 
 class Account extends Component {
 	constructor() {
 		super();
+		this.Auth = new AuthService();
 	}
 
 	state = {
@@ -18,6 +19,11 @@ class Account extends Component {
 
 	//Get user info
 	componentDidMount() {
+		//If we are not logged in, redirect us to login
+		if (!this.Auth.loggedIn()) {
+			this.props.history.replace('/login');
+		}
+
 		axios.get('/user/' + this.props.user.identity).then(res => {
 			this.setState({ userData: res.data });
 		});
@@ -26,9 +32,6 @@ class Account extends Component {
 	render() {
 		const user = this.props.user;
 
-		{
-			/* If we have an associated promoter, show it. Otherwise, show the create promoter form*/
-		}
 		const promoterSection = this.state.userData.promoter_name ? (
 			<Promoter />
 		) : (
@@ -59,4 +62,4 @@ class Account extends Component {
 	}
 }
 
-export default hidden(withAuth(Account));
+export default withAuth(Account);

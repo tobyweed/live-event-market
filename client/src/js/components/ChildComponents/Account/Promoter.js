@@ -46,4 +46,4 @@ class Promoter extends Component {
 	}
 }
 
-export default hidden(withAuth(Promoter));
+export default withAuth(Promoter);

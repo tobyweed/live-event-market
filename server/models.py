@@ -83,7 +83,6 @@ class PromoterModel(db.Model):
 
 
 
-
 #for when a user logs out, so we can disable their keys
 class RevokedTokenModel(db.Model):
     __tablename__ = 'revoked_tokens'
