@@ -48,6 +48,7 @@ api.add_resource(endpoints.TokenRefresh, '/token/refresh')
 api.add_resource(endpoints.AllUsers, '/users')
 api.add_resource(endpoints.OneUser, '/user/<string:user>')
 api.add_resource(endpoints.PromoterRegistration, '/promoters/registration')
+api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.SecretResource, '/yo')
 
 #run

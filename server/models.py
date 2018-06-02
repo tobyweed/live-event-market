@@ -18,7 +18,7 @@ class UserModel(db.Model):
     phoneNumber = db.Column(db.String(120))
     proPic = db.Column(db.String(120))
     organization = db.Column(db.String(120))
-    promoter_id = db.Column(db.Integer, db.ForeignKey('promoters.id'))
+    promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
 
     promoter = db.relationship("PromoterModel", back_populates="users")
 
@@ -72,6 +72,15 @@ class PromoterModel(db.Model):
     @classmethod
     def find_by_name(cls, name):
        return cls.query.filter_by(name = name).first()
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'name': x.name
+            }
+        return {'users': list(map(lambda x: to_json(x), PromoterModel.query.all()))}
+
 
 
 

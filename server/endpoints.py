@@ -13,6 +13,7 @@ class UserSchema(Schema):
     phoneNumber = fields.Str(missing=None)
     proPic = fields.Str(missing=None)
     organization = fields.Str(missing=None)
+    promoter_name = fields.Str()
 
 class PromoterSchema(Schema):
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
@@ -50,21 +51,48 @@ class AllUsers(Resource):
 '''
 ================PROMOTER RESOURCES================
 '''
+#return one promoter's data.
+#can only be called by a user who is associated with the promoter.
+class OnePromoter(Resource):
+    @jwt_required
+    def get(self, user):
+        #get identity & find the identity's info
+        current_user = get_jwt_identity()
+        result = UserModel.find_by_username(user)
+        #pull our associated promoter's name from our info. Note that this will throw an error if the user has no associated promoter
+        promoter_name = result.promoter_name
+        promoter = PromoterModel.find_by_name(promoter_name)
+
+        #if we're the right user, serialize the found promoter and return the results
+        if(user == current_user):
+            return promoter_schema.dump(promoter)
+        else:
+            return {'message': 'You are not authorized to access this information.'}
+
+
 #register a new promoter
 class PromoterRegistration(Resource):
     @jwt_required
     def post(self):
         data = request.get_json()
         promoter = promoter_schema.load(data)
+        #get current user
+        current_user = get_jwt_identity()
+        user = UserModel.find_by_username(current_user)
+
+        #do not process request if a promoter with that name already exists
         if PromoterModel.find_by_name(promoter.data['name']):
-            return {'message': 'promoter {} already exists'. format(promoter.data['name'])}
+            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}
+
+        #do not process request if this user already has an associated promoter
+        if user.promoter_name:
+            return {'message': 'You are already associated with a promoter account'}
 
         new_promoter = PromoterModel(
             name = promoter.data['name']
         )
 
-        current_user = get_jwt_identity()
-        user = UserModel.find_by_username(current_user)
+
         new_promoter.users.append(user)
 
         try:
@@ -110,7 +138,7 @@ class UserRegistration(Resource):
             email = user.data['email'],
             phoneNumber = user.data['phoneNumber'],
             proPic = user.data['proPic'],
-            organization = user.data['organization'],
+            organization = user.data['organization']
         )
 
         try:
