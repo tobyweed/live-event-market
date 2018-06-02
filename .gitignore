@@ -13,3 +13,4 @@ serverenv
 __pycache__
 .DS_Store
 *.pyc
+app.db
