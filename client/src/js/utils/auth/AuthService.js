@@ -101,12 +101,17 @@ class AuthService {
 
 	setHeader() {
 		if (this.loggedIn()) {
-			axios.defaults.headers.common[
-				'Authorization'
-			] = axios.defaults.headers.common['Authorization'] =
+			axios.defaults.headers.common['Authorization'] =
 				'Bearer ' + this.getAccess();
 		}
 	}
 }
+
+/* The following is a command to enter in console in the browser.
+It changes the access token to an expired one. This is how to test
+refresh token functionality.
+
+localStorage.setItem('id_access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwOTZlMzhiNC01NGNhLTQ4ZjYtYjA2Mi02MjY1NGMxNzBkN2MiLCJleHAiOjE1Mjc5NjQ2MjksImZyZXNoIjpmYWxzZSwiaWF0IjoxNTI3OTYzNzI5LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTI3OTYzNzI5LCJpZGVudGl0eSI6InRlc3QifQ.Eg5je9u-vQNT1vAl33j-wlZ7lBB5ObzymntdLUV-qEI');
+*/
 
 export default AuthService;

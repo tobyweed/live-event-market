@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 import withAuth from '../../../utils/auth/withAuth';
-import hidden from '../../../utils/auth/hidden';
 
 class Promoter extends Component {
 	constructor() {
@@ -29,8 +28,6 @@ class Promoter extends Component {
 					<h1>Promoter</h1>
 					<h3>Details</h3>
 					<ul>
-						{/* Currently just rendering a list of user info. Basically that's all there is to it
-            to the Promoter page, plus styling, editing, and promoter Promoter creation */}
 						<li>Name: {this.state.promoterData.name}</li>
 						{/*<li>First Name: {this.state.userData.firstName}</li>
 						<li>Last Name: {this.state.userData.lastName}</li>
@@ -38,6 +35,7 @@ class Promoter extends Component {
 						<li>Phone #: {this.state.userData.phoneNumber}</li>
 						<li>Organization: {this.state.userData.organization}</li>*/}
 					</ul>
+					{/* Insert component with promoter and user props.  */}
 				</div>
 			);
 		} else {

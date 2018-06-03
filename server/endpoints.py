@@ -69,6 +69,41 @@ class OnePromoter(Resource):
         else:
             return {'message': 'You are not authorized to access this information.'}
 
+#add a user to a Promoter
+class AddUser(Resource):
+    @jwt_required
+    def post(self):
+        data = request.get_json()
+
+        #get invited user
+        invited_user_name = data['username']
+        invited_user = UserModel.find_by_username(invited_user_name)
+        #get current user
+        current_user_name = get_jwt_identity()
+        current_user = UserModel.find_by_username(current_user_name)
+
+        #current user needs to have a promoter account, invited user needs to not have one
+
+            #get promoter
+        promoter_name = current_user.promoter_name
+        promoter = PromoterModel.find_by_name(promoter_name)
+        if not promoter:
+            return {'message': 'You cannot add other users to your promoter account if you don\'t have one'}, 500
+
+        if PromoterModel.find_by_name(invited_user.promoter_name):
+            return {'message': 'That user is already part of a promoter account'}, 500
+
+
+        #add the user
+        promoter.users.append(invited_user)
+        try:
+            promoter.save_to_db()
+            return {
+                'message': 'User {} was added to your promoter account'.format(invited_user_name)
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+
 
 #register a new promoter
 class PromoterRegistration(Resource):
