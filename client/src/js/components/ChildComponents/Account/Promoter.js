@@ -21,6 +21,8 @@ class Promoter extends Component {
 
 	render() {
 		const user = this.props.user;
+		const users = this.state.promoterData.users;
+		console.log(users);
 
 		if (user) {
 			return (
@@ -29,8 +31,17 @@ class Promoter extends Component {
 					<h3>Details</h3>
 					<ul>
 						<li>Name: {this.state.promoterData.name}</li>
-						{/*<li>First Name: {this.state.userData.firstName}</li>
-						<li>Last Name: {this.state.userData.lastName}</li>
+						<li>
+							Users:
+							{users && (
+								<ul>
+									{users.map(function(member) {
+										return <li>{member.username}</li>;
+									})}
+								</ul>
+							)}
+						</li>
+						{/*<li>Last Name: {this.state.userData.lastName}</li>
 						<li>Email: {this.state.userData.email}</li>
 						<li>Phone #: {this.state.userData.phoneNumber}</li>
 						<li>Organization: {this.state.userData.organization}</li>*/}
