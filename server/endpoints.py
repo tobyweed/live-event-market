@@ -17,6 +17,7 @@ class UserSchema(Schema):
 
 class PromoterSchema(Schema):
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    users = fields.Nested(UserSchema, only=['username'], many=True)
 
 #initialize schemas
 user_schema = UserSchema()

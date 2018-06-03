@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
 import Promoter from '../ChildComponents/Account/Promoter';
+import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
+import PromoterAddUser from '../ChildComponents/Account/PromoterAddUser';
 
 import withAuth from '../../utils/auth/withAuth';
 import AuthService from '../../utils/auth/AuthService';
@@ -33,7 +34,10 @@ class Account extends Component {
 		const user = this.props.user;
 
 		const promoterSection = this.state.userData.promoter_name ? (
-			<Promoter />
+			<div>
+				<Promoter />
+				<PromoterAddUser />
+			</div>
 		) : (
 			<PromoterRegistration />
 		);
@@ -55,6 +59,7 @@ class Account extends Component {
 					</ul>
 					<div>{promoterSection}</div>
 					<div>
+						<h3>Logout</h3>
 						<button
 							type="button"
 							className="form-submit"
