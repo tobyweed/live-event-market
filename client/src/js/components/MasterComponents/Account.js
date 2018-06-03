@@ -54,11 +54,25 @@ class Account extends Component {
 						<li>Organization: {this.state.userData.organization}</li>
 					</ul>
 					<div>{promoterSection}</div>
+					<div>
+						<button
+							type="button"
+							className="form-submit"
+							onClick={this.handleLogout.bind(this)}
+						>
+							Logout
+						</button>
+					</div>
 				</div>
 			);
 		} else {
 			return null;
 		}
+	}
+
+	handleLogout() {
+		this.Auth.logout();
+		this.props.history.replace('/login');
 	}
 }
 

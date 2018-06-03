@@ -1,10 +1,17 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import '../../css/App.css';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
-import hidden from '../utils/auth/hidden';
+
+import LoginForm from './ChildComponents/LoginForm';
+import RegistrationForm from './ChildComponents/RegistrationForm';
+import Home from './MasterComponents/Home.js';
+import Account from './MasterComponents/Account';
+import Nav from './ChildComponents/Nav';
+import Footer from './ChildComponents/Footer';
 
 class App extends Component {
 	constructor() {
@@ -16,52 +23,25 @@ class App extends Component {
 		yo: 'hi'
 	};
 
-	componentDidMount() {
-		//If we are not logged in, redirect us to login
-		if (!this.Auth.loggedIn()) {
-			this.props.history.replace('/login');
-		}
-
-		axios.get('/yo').then(res => {
-			this.setState({ yo: res.data.answer });
-		});
-	}
-
-	//& {yo}
 	render() {
-		const { yo } = this.state;
-		const user = this.props.user;
 		return (
-			<div>
-				<div className="App">APP</div>
-				<div className="App">
-					<div className="App-header">
-						<h2>
-							{/*the code below only tries to return an identity if there is a user*/}
-							Welcome {!!this.props.user ? this.props.user.identity + ', ' : ''}
-							and {yo}
-						</h2>
-					</div>
-					<p className="App-intro">
-						<button
-							type="button"
-							className="form-submit"
-							onClick={this.handleLogout.bind(this)}
-						>
-							Logout
-						</button>
-					</p>
+			<Router>
+				<div>
+					<Nav />
+					<Route exact path="/" component={Home} />
+					<Route path="/login" component={LoginForm} />
+					<Route path="/registration" component={RegistrationForm} />
+					<Route path="/account" component={Account} />
+					<Footer />
 				</div>
-
-				<div />
-			</div>
+			</Router>
 		);
 	}
-
-	handleLogout() {
-		this.Auth.logout();
-		this.props.history.replace('/login');
-	}
 }
+
+//<Route path="/Search" component={_search} />
+//<Route path="/Event" component={_event} />
+//<Route path="/User" component={_user} />
+//<Route path="/Pomoter" component={_promoter} />
 
 export default withAuth(App);

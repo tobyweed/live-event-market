@@ -33,9 +33,12 @@ export default function withAuth(AuthComponent) {
 					this.setPrivileges();
 				});
 			} else {
-				this.Auth.logout();
-				this.props.history.replace('/login');
-				console.log('Something went wrong');
+				// this.Auth.logout();
+				// this.props.history.replace('/login');
+				this.setState({
+					user: ' '
+				});
+				console.log('Not logged in');
 			}
 		}
 

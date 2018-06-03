@@ -3,7 +3,6 @@ import axios from 'axios';
 
 import AuthService from '../../../utils/auth/AuthService';
 import withAuth from '../../../utils/auth/withAuth';
-import hidden from '../../../utils/auth/hidden';
 
 class PromoterRegistration extends Component {
 	constructor() {

@@ -1,3 +1,5 @@
+//This component is not currently in use
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 //comment
