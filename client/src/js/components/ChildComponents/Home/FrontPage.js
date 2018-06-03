@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import '../../../../css/FrontPage.css';
 import videoimg from '../../../../images/video.png';
 
@@ -9,7 +8,7 @@ class FrontPage extends Component {
 			<div className="frontpage">
 				<div className="video">
 					<div className="video_content">
-						<img className="video_content" src={videoimg} />
+						<img className="video_content" src={videoimg} alt="video" />
 					</div>
 				</div>
 				<div className="intro">
@@ -25,24 +24,31 @@ class FrontPage extends Component {
 				</div>
 				<div className="form">
 					<div className="form_content">
-						<form className="form_grid" method="POST" action="/send">
+						<form
+							className="form_grid"
+							method="POST"
+							action="/send"
+							onSubmit={this.handleFormSubmit}
+						>
 							<input
 								className="button_plain form_search"
 								type="text"
 								name="artist"
 								placeholder="Search Event, Promoter, or Sponsor"
+								onChange={this.handleChange}
 							/>
 							<input
 								className="button_color form_submit"
 								type="submit"
 								value="Search"
+								onChange={this.handleChange}
 							/>
 							<div className="form_artist">
 								<input
 									type="radio"
 									name="search_type"
 									value="search_artist"
-									checked
+									onChange={this.handleChange}
 								/>{' '}
 								&nbsp; Artist
 							</div>
@@ -55,6 +61,7 @@ class FrontPage extends Component {
 									type="radio"
 									name="search_type"
 									value="search_promoter"
+									onChange={this.handleChange}
 								/>{' '}
 								&nbsp; Promoter
 							</div>

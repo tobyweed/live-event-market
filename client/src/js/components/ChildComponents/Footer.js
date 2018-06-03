@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import '../../../css/Footer.css';
-import blank_prof from '../../../images/blank_prof.png';
 
 class Footer extends Component {
 	render() {
@@ -18,7 +17,18 @@ class Footer extends Component {
 					</div>
 
 					<div className="footer_links">
-						<h5>ABOUT</h5>Platform<br />Services<br />Partners<br />Case Studies<br />team<br />Contact
+						<h5>ABOUT</h5>
+						<Link to="/platform">Platform</Link>
+						<br />
+						<Link to="/services">Services</Link>
+						<br />
+						<Link to="/partners">Partners</Link>
+						<br />
+						<Link to="/case-studies">Case Studies</Link>
+						<br />
+						<Link to="/team">Team</Link>
+						<br />
+						<Link to="/contact">Contact</Link>
 					</div>
 
 					<div className="footer_email">

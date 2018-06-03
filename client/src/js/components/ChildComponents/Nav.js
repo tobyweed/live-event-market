@@ -5,7 +5,6 @@ import master_logo from '../../../images/master_logo.png';
 import blank_prof from '../../../images/blank_prof.png';
 
 import AuthService from '../../utils/auth/AuthService';
-import withAuth from '../../utils/auth/withAuth';
 
 class Nav extends Component {
 	constructor() {

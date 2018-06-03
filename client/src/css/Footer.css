@@ -9,6 +9,9 @@
 	margin: 0;
 	padding: 0 10vw;
 }
+.footer a {
+	color: #333;
+}
 .footer_company {
 	grid-area: footer_company;
 	padding: 2vh;

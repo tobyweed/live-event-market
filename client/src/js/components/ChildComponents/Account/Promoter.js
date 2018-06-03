@@ -4,10 +4,6 @@ import axios from 'axios';
 import withAuth from '../../../utils/auth/withAuth';
 
 class Promoter extends Component {
-	constructor() {
-		super();
-	}
-
 	state = {
 		promoterData: ''
 	};
@@ -35,8 +31,8 @@ class Promoter extends Component {
 							Users:
 							{users && (
 								<ul>
-									{users.map(function(member) {
-										return <li>{member.username}</li>;
+									{users.map(function(member, i) {
+										return <li key={i}>{member.username}</li>;
 									})}
 								</ul>
 							)}
