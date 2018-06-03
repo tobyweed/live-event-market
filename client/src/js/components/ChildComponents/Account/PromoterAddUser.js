@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import AuthService from '../../../utils/auth/AuthService';
 import withAuth from '../../../utils/auth/withAuth';
 
 class PromoterAddUser extends Component {
