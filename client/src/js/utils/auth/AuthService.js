@@ -11,9 +11,20 @@ class AuthService {
 				password: password
 			})
 			.then(res => {
-				this.setAccess(res.data.access_token);
-				this.setRefresh(res.data.refresh_token);
+				const access = res.data.access_token;
+				const refresh = res.data.refresh_token;
+				if (!!access && !!refresh) {
+					this.setAccess(res.data.access_token);
+					this.setRefresh(res.data.refresh_token);
+				} else {
+					alert('Those credentials do not exist');
+				}
 				return Promise.resolve(res);
+			})
+			.catch(err => {
+				console.log(err);
+				alert('something went wrong');
+				return 'something went wrong';
 			});
 	}
 

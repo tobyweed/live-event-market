@@ -2,6 +2,10 @@ from flask_restful import Resource, request
 from models import PromoterModel, UserModel, RevokedTokenModel
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from marshmallow import Schema, fields, post_load
+from sqlalchemy import update
+
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 #declare schemas
 class UserSchema(Schema):
@@ -39,6 +43,37 @@ class OneUser(Resource):
             return user_schema.dump(result)
         else:
             return {'message': 'You are not authorized to access this information.'}
+    def put(self, user):
+        data = request.get_json()
+
+        #get invited user
+        username = data['username']
+        the_user = UserModel.find_by_username(username)
+
+        user = user_schema.load(data)
+        if not UserModel.find_by_username(data['username']):
+            return {'message': 'User {} does not exist'. format(data['username'])}
+        print(the_user)
+        new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==user.data['username']).values(
+            firstName = user.data['firstName'],
+            lastName = user.data['lastName'],
+            email = user.data['email'],
+            phoneNumber = user.data['phoneNumber'],
+            proPic = user.data['proPic'],
+            organization = user.data['organization']
+        )
+
+        # try:
+        db.session.execute(new_user)
+        db.session.commit()
+        return {
+            'message': 'User {} was updated'.format( data['username'])
+        }
+        # except:
+        #     return {'message': 'Something went wrong'}, 500
+
+
+
 
 #this is a development route, to be deleted later
 class AllUsers(Resource):

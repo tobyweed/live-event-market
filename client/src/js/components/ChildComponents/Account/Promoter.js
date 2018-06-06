@@ -18,7 +18,6 @@ class Promoter extends Component {
 	render() {
 		const user = this.props.user;
 		const users = this.state.promoterData.users;
-		console.log(users);
 
 		if (user) {
 			return (
