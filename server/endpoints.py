@@ -47,30 +47,30 @@ class OneUser(Resource):
         data = request.get_json()
 
         #get invited user
-        username = data['username']
+        username = user
         the_user = UserModel.find_by_username(username)
 
-        user = user_schema.load(data)
-        if not UserModel.find_by_username(data['username']):
-            return {'message': 'User {} does not exist'. format(data['username'])}
-        print(the_user)
-        new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==user.data['username']).values(
-            firstName = user.data['firstName'],
-            lastName = user.data['lastName'],
-            email = user.data['email'],
-            phoneNumber = user.data['phoneNumber'],
-            proPic = user.data['proPic'],
-            organization = user.data['organization']
+        edited_user = user_schema.load(data)
+        if not UserModel.find_by_username(user):
+            return {'message': 'User {} does not exist'. format(user)}
+
+        new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==user).values(
+            firstName = edited_user.data['firstName'],
+            lastName = edited_user.data['lastName'],
+            email = edited_user.data['email'],
+            phoneNumber = edited_user.data['phoneNumber'],
+            proPic = edited_user.data['proPic'],
+            organization = edited_user.data['organization']
         )
 
-        # try:
-        db.session.execute(new_user)
-        db.session.commit()
-        return {
-            'message': 'User {} was updated'.format( data['username'])
-        }
-        # except:
-        #     return {'message': 'Something went wrong'}, 500
+        try:
+            db.session.execute(new_user)
+            db.session.commit()
+            return {
+                'message': 'User {} was updated'.format(user)
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 
@@ -174,18 +174,17 @@ class PromoterRegistration(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
+'''
+================EVENT RESOURCES================
+'''
 
 
-'''
-================MISC RESOURCES================
-'''
-#secret resource for testing
-class SecretResource(Resource):
-    @jwt_required
-    def get(self):
-        return {
-            'answer': 42
-        }
+
+
+
+
+
+
 
 
 

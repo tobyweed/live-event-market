@@ -28,6 +28,7 @@ class LoginForm extends Component {
 						name="username"
 						type="text"
 						onChange={this.handleChange}
+						required
 					/>
 					<input
 						className="form-item"
@@ -35,6 +36,7 @@ class LoginForm extends Component {
 						name="password"
 						type="password"
 						onChange={this.handleChange}
+						required
 					/>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>

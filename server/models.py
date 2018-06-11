@@ -4,6 +4,45 @@ from passlib.hash import pbkdf2_sha256 as sha256
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
 
 
+# Event models
+'''
+One model (EventInfo) has most of the important fields,
+another (Event) has all of the date and location info.
+
+The eventinfo to event relationship is one to many.
+There is another one to many join for event types, and another for images.
+'''
+class EventInfo(db.Model):
+    __tablename__ = 'event_info'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(120), nullable = False)
+
+    events = db.relationship("Event", order_by=Event.id, back_populates="event_info")
+    #Promoter
+    #event
+    #event type
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class Event(db.Model):
+    __tablename__ = 'event'
+
+    id = db.Column(db.Integer, primary_key = True)
+
+    event_info = db.relationship("EventInfo", back_populates="events")
+    #Promoter
+    #event
+    #event type
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
 #represents users
 class UserModel(db.Model):
     __tablename__ = 'users'

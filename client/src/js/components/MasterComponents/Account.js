@@ -4,6 +4,7 @@ import axios from 'axios';
 import Promoter from '../ChildComponents/Account/Promoter';
 import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
 import PromoterAddUser from '../ChildComponents/Account/PromoterAddUser';
+import EditAccount from '../ChildComponents/Account/EditAccount';
 
 import withAuth from '../../utils/auth/withAuth';
 import AuthService from '../../utils/auth/AuthService';
@@ -32,6 +33,7 @@ class Account extends Component {
 
 	render() {
 		const user = this.props.user;
+		const userData = this.state.userData;
 
 		const promoterSection = this.state.userData.promoter_name ? (
 			<div>
@@ -50,12 +52,15 @@ class Account extends Component {
 					<ul>
 						{/* Currently just rendering a list of user info. Basically that's all there is to it
             to the account page, plus styling, editing, and promoter account creation */}
-						<li>Username: {this.state.userData.username}</li>
-						<li>First Name: {this.state.userData.firstName}</li>
-						<li>Last Name: {this.state.userData.lastName}</li>
-						<li>Email: {this.state.userData.email}</li>
-						<li>Phone #: {this.state.userData.phoneNumber}</li>
-						<li>Organization: {this.state.userData.organization}</li>
+						<li>Username: {userData.username}</li>
+						<li>First Name: {userData.firstName}</li>
+						<li>Last Name: {userData.lastName}</li>
+						<li>Email: {userData.email}</li>
+						<li>Phone #: {userData.phoneNumber}</li>
+						<li>Organization: {userData.organization}</li>
+						{userData && (
+							<EditAccount userData={userData} reRender={this.reRender} />
+						)}
 					</ul>
 					<div>{promoterSection}</div>
 					<div>
@@ -73,6 +78,10 @@ class Account extends Component {
 		} else {
 			return null;
 		}
+	}
+
+	reRender() {
+		this.forceUpdate();
 	}
 
 	handleLogout() {
