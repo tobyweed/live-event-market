@@ -12,6 +12,24 @@ another (Event) has all of the date and location info.
 The eventinfo to event relationship is one to many.
 There is another one to many join for event types, and another for images.
 '''
+
+class Event(db.Model):
+    __tablename__ = 'event'
+
+    id = db.Column(db.Integer, primary_key = True)
+    event_name = db.Column(db.String(120), db.ForeignKey('event_info.name'))
+
+    event_info = db.relationship("EventInfo", back_populates="events")
+    #Promoter
+    #event
+    #event type
+
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+
 class EventInfo(db.Model):
     __tablename__ = 'event_info'
 
@@ -27,20 +45,10 @@ class EventInfo(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @classmethod
+    def find_by_name(cls, name):
+       return cls.query.filter_by(name = name).first()
 
-class Event(db.Model):
-    __tablename__ = 'event'
-
-    id = db.Column(db.Integer, primary_key = True)
-
-    event_info = db.relationship("EventInfo", back_populates="events")
-    #Promoter
-    #event
-    #event type
-
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
 
 
 #represents users

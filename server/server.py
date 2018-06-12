@@ -50,7 +50,7 @@ api.add_resource(endpoints.OneUser, '/user/<string:user>')
 api.add_resource(endpoints.PromoterRegistration, '/promoters/registration')
 api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.AddUser, '/promoter/adduser')
-api.add_resource(endpoints.SecretResource, '/yo')
+api.add_resource(endpoints.Test, '/test')
 
 #run
 if __name__ == '__main__':

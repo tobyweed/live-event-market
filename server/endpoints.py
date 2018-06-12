@@ -1,7 +1,7 @@
 from flask_restful import Resource, request
-from models import PromoterModel, UserModel, RevokedTokenModel
+from models import PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields
 from sqlalchemy import update
 
 from flask_sqlalchemy import SQLAlchemy
@@ -27,6 +27,12 @@ class PromoterSchema(Schema):
 user_schema = UserSchema()
 promoter_schema = PromoterSchema()
 
+'''
+================EVENT RESOURCES================
+'''
+
+
+
 
 '''
 ================USER RESOURCES================
@@ -43,16 +49,22 @@ class OneUser(Resource):
             return user_schema.dump(result)
         else:
             return {'message': 'You are not authorized to access this information.'}
+    @jwt_required
     def put(self, user):
         data = request.get_json()
 
-        #get invited user
+        #get user trying to update
         username = user
         the_user = UserModel.find_by_username(username)
+
 
         edited_user = user_schema.load(data)
         if not UserModel.find_by_username(user):
             return {'message': 'User {} does not exist'. format(user)}
+
+        current_user = get_jwt_identity()
+        if not current_user == username:
+            return {'message': 'You are not authorized to perform that action'}
 
         new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==user).values(
             firstName = edited_user.data['firstName'],
@@ -120,7 +132,7 @@ class AddUser(Resource):
 
         #current user needs to have a promoter account, invited user needs to not have one
 
-            #get promoter
+        #get promoter
         promoter_name = current_user.promoter_name
         promoter = PromoterModel.find_by_name(promoter_name)
         if not promoter:
@@ -173,19 +185,6 @@ class PromoterRegistration(Resource):
             }
         except:
             return {'message': 'Something went wrong'}, 500
-
-'''
-================EVENT RESOURCES================
-'''
-
-
-
-
-
-
-
-
-
 
 
 '''
