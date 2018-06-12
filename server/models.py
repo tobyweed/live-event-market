@@ -1,7 +1,32 @@
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
+from marshmallow import Schema, fields
 
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
+
+#declare schemas
+class UserSchema(Schema):
+    username = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    password = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    firstName = fields.Str(missing=None)
+    lastName = fields.Str(missing=None)
+    email = fields.Str(missing=None)
+    phoneNumber = fields.Str(missing=None)
+    proPic = fields.Str(missing=None)
+    organization = fields.Str(missing=None)
+    promoter_name = fields.Str()
+
+class PromoterSchema(Schema):
+    name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    users = fields.Nested(UserSchema, only=['username'], many=True)
+
+class EventSchema(Schema):
+    event_name = fields.Str()
+
+class EventInfoSchema(Schema):
+    name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    events = fields.Nested(EventSchema, only=['id'], many=True)
+
 
 
 # Event models
@@ -28,6 +53,9 @@ class Event(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @classmethod
+    def find_by_id(cls, id):
+       return cls.query.filter_by(id = id).first()
 
 
 class EventInfo(db.Model):

@@ -2,7 +2,7 @@ import unittest
 import server
 import json
 from endpoints import user_schema
-from models import UserModel
+from models import UserModel, EventInfo, Event
 
 TEST_SQLALCHEMY_DATABASE_URI = 'sqlite:///test.sqlite'
 
@@ -17,6 +17,18 @@ def setUpModule():
 def tearDownModule():
     with server.app.app_context():
         server.db.drop_all()
+
+#set up db
+class TestWithDB(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.app = server.app.test_client()
+
+    @classmethod
+    def tearDownClass(self):
+        with server.app.app_context():
+            server.db.session.remove()
+
 
 #parent class to provide methods
 class AuthTest(unittest.TestCase):
@@ -90,6 +102,29 @@ class PermissionTest(AuthTest):
             user_from_model = user_schema.dump(UserModel.find_by_username('test')).data
             self.assertEqual(user_from_server, user_from_model)
 
+class EventModelTest(TestWithDB):
+    def test_models(self):
+        new_event_info = EventInfo(
+            name = 'test'
+        )
+        new_event = Event()
+        with server.app.app_context():
+            new_event_info.events.append(new_event)
+            new_event_info.save_to_db()
+            new_event.save_to_db()
+
+            event = Event.find_by_id(1)
+            event_info = EventInfo.find_by_name('test')
+            self.assertEqual(event_info.name, event.event_name)
+
+# class EventCreationTest(TestWithDB):
+#     def test_event_create(self):
+#         self.app.post('/create-event', json={
+#             'username':username,
+#             'password':password
+#         }, follow_redirects=True)
+
+
 '''
 TODO: Write tests for OneUser put, OnePromoter, AddUser,
 and PromoterRegistration.
@@ -101,5 +136,6 @@ if __name__ == '__main__':
     suite1 = unittest.TestLoader().loadTestsFromTestCase(RegisterTest)
     suite2 = unittest.TestLoader().loadTestsFromTestCase(PermissionTest)
     suite3 = unittest.TestLoader().loadTestsFromTestCase(LoginTest)
-    suite = unittest.TestSuite([suite1,suite2,suite3])
+    suite4 = unittest.TestLoader().loadTestsFromTestCase(EventModelTest)
+    suite = unittest.TestSuite([suite1,suite2,suite3, suite4])
     unittest.TextTestRunner().run(suite)
