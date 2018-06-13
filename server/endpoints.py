@@ -2,6 +2,8 @@ from flask_restful import Resource, request
 from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, PromoterSchema, EventSchema, EventInfoSchema)
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from sqlalchemy import update
+from datetime import datetime
+import json
 
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
@@ -9,6 +11,8 @@ db = SQLAlchemy()
 #initialize schemas
 user_schema = UserSchema()
 promoter_schema = PromoterSchema()
+event_info_schema = EventInfoSchema()
+event_schema = EventSchema()
 
 '''
 ================EVENT RESOURCES================
@@ -17,31 +21,44 @@ promoter_schema = PromoterSchema()
 class CreateEvent(Resource):
     @jwt_required
     def post(self):
+        # get json
         data = request.get_json()
-        event = event_schema.load(data)
         #get current user
-        current_user = get_jwt_identity()
-        user = UserModel.find_by_username(current_user)
+        current_user_jwt = get_jwt_identity()
+        current_user = UserModel.find_by_username(current_user_jwt)
+        current_user_promoter = current_user.promoter_name
 
-        #do not process request if a promoter with that name already exists
-        if PromoterModel.find_by_name(promoter.data['name']):
-            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}
+        # Throw an error if: current user has no promoter account
+        if not current_user_promoter:
+            return {'message': 'You cannot create events without a promoter account'}
 
-        #do not process request if this user already has an associated promoter
-        if user.promoter_name:
-            return {'message': 'You are already associated with a promoter account'}
-
-        new_promoter = PromoterModel(
-            name = promoter.data['name']
+        # create event_info out of json
+        event_info = event_info_schema.load(data)
+        new_event_info = EventInfo(
+            name = event_info.data['name']
         )
 
+        # create associated event(s) out of nested object(s), single if single plural else
+        events = event_info.data['events']
+        for i in range(len(events)):
+            start_date = events[i]['start_date']
+            new_event = Event(
+                start_date = start_date
+            )
 
-        new_promoter.users.append(user)
+        # append created Events to created event_info
+        new_event_info.events.append(new_event)
+
+        # append create event_info to promoter of current user
+        promoter = PromoterModel.find_by_name(current_user_promoter)
+        promoter.event_infos.append(new_event_info)
 
         try:
-            new_promoter.save_to_db()
+            new_event.save_to_db()
+            new_event_info.save_to_db()
+            promoter.save_to_db()
             return {
-                'message': 'Promoter {} was created'.format( promoter.data['name'])
+                'message': 'Event {} was created'.format(data['name'])
             }
         except:
             return {'message': 'Something went wrong'}, 500
@@ -189,7 +206,6 @@ class PromoterRegistration(Resource):
             name = promoter.data['name']
         )
 
-
         new_promoter.users.append(user)
 
         try:
@@ -292,3 +308,10 @@ class TokenRefresh(Resource):
             'access_token': access_token,
             'refresh_token': refresh_token
         }
+
+#Encoder
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)

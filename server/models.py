@@ -21,11 +21,13 @@ class PromoterSchema(Schema):
     users = fields.Nested(UserSchema, only=['username'], many=True)
 
 class EventSchema(Schema):
+    start_date = fields.DateTime()
     event_name = fields.Str()
 
 class EventInfoSchema(Schema):
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
-    events = fields.Nested(EventSchema, only=['id'], many=True)
+    events = fields.Nested(EventSchema, many=True)
+    promoter_name = fields.Str()
 
 
 
@@ -40,14 +42,13 @@ There is another one to many join for event types, and another for images.
 
 class Event(db.Model):
     __tablename__ = 'event'
+    __table_args__ = {'extend_existing': True}
 
     id = db.Column(db.Integer, primary_key = True)
+    start_date = db.Column(db.DateTime)
     event_name = db.Column(db.String(120), db.ForeignKey('event_info.name'))
 
     event_info = db.relationship("EventInfo", back_populates="events")
-    #Promoter
-    #event
-    #event type
 
     def save_to_db(self):
         db.session.add(self)
@@ -60,14 +61,16 @@ class Event(db.Model):
 
 class EventInfo(db.Model):
     __tablename__ = 'event_info'
+    __table_args__ = {'extend_existing': True}
 
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(120), nullable = False)
+    promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
 
     events = db.relationship("Event", order_by=Event.id, back_populates="event_info")
-    #Promoter
-    #event
+    promoter = db.relationship("PromoterModel", back_populates="event_infos")
     #event type
+    #event images
 
     def save_to_db(self):
         db.session.add(self)
@@ -139,6 +142,7 @@ class PromoterModel(db.Model):
     name = db.Column(db.String(120), unique = True, nullable = False)
 
     users = db.relationship("UserModel", order_by=UserModel.id, back_populates="promoter")
+    event_infos = db.relationship("EventInfo", order_by=EventInfo.id, back_populates="promoter")
 
     def save_to_db(self):
         db.session.add(self)
