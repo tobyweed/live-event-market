@@ -1,8 +1,10 @@
 import unittest
 import server
 import json
-from endpoints import user_schema
-from models import UserModel, EventInfo, Event
+from flask import jsonify
+from datetime import datetime
+from endpoints import user_schema, DateTimeEncoder
+from models import UserModel, EventInfo, Event, PromoterModel
 
 TEST_SQLALCHEMY_DATABASE_URI = 'sqlite:///test.sqlite'
 
@@ -18,27 +20,16 @@ def tearDownModule():
     with server.app.app_context():
         server.db.drop_all()
 
-#set up db
-class TestWithDB(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        self.app = server.app.test_client()
-
-    @classmethod
-    def tearDownClass(self):
-        with server.app.app_context():
-            server.db.session.remove()
-
 
 #parent class to provide methods
 class AuthTest(unittest.TestCase):
-
     #set context and give a test user
     @classmethod
     def setUpClass(self):
         self.app = server.app.test_client()
         with server.app.app_context():
             self.register('test','test')
+            self.registerPromoter('test','test','test')
 
     #clean the db after every test
     @classmethod
@@ -52,6 +43,32 @@ class AuthTest(unittest.TestCase):
             'username':username,
             'password':password
         }, follow_redirects=True)
+
+    @classmethod
+    def registerPromoter(self, name, username, password):
+        token = self.getToken(username, password)
+        return self.app.post('/promoters/registration', headers={
+            'Content-Type':'application/json',
+            'Authorization': 'Bearer {}'.format(token)
+        }, json={
+            'name':name
+        }, follow_redirects=True)
+
+    @classmethod
+    def createEvent(self, name, start_date, username, password):
+        token = self.getToken(username, password)
+        start_date = json.dumps(start_date,cls=DateTimeEncoder)
+        start_date = start_date.replace('"','')
+        return self.app.post('/create-event', headers={
+            'Content-Type':'application/json',
+            'Authorization': 'Bearer {}'.format(token)
+        }, json={
+            'name':name,
+            'events':[
+                    {'start_date':start_date},
+                    {'start_date':'2019-11-11T18:45:10.000000'}
+                ]
+            }, follow_redirects=True)
 
     @classmethod
     def login(self, username, password):
@@ -102,27 +119,38 @@ class PermissionTest(AuthTest):
             user_from_model = user_schema.dump(UserModel.find_by_username('test')).data
             self.assertEqual(user_from_server, user_from_model)
 
-class EventModelTest(TestWithDB):
+class EventModelTest(AuthTest):
     def test_models(self):
         new_event_info = EventInfo(
             name = 'test'
         )
-        new_event = Event()
+        new_event = Event(
+            start_date = datetime.now()
+        )
         with server.app.app_context():
+            promoter = PromoterModel.find_by_name('test')
+            #add promoters/users
+            promoter.event_infos.append(new_event_info)
             new_event_info.events.append(new_event)
+
+            #commit changes
             new_event_info.save_to_db()
             new_event.save_to_db()
 
+            #find the event entries
             event = Event.find_by_id(1)
             event_info = EventInfo.find_by_name('test')
-            self.assertEqual(event_info.name, event.event_name)
 
-# class EventCreationTest(TestWithDB):
-#     def test_event_create(self):
-#         self.app.post('/create-event', json={
-#             'username':username,
-#             'password':password
-#         }, follow_redirects=True)
+            #test if the event_info to event relationship is established
+            self.assertEqual(event_info.name, event.event_name)
+            #test if  the event_info to promoter relationship is established
+            self.assertEqual(event_info.promoter_name, promoter.name)
+
+class EventCreationTest(AuthTest):
+    def test_event_create(self):
+        with server.app.app_context():
+            rv = self.createEvent('test',datetime.now(),'test','test')
+            assert b'Event test was created' in rv.data
 
 
 '''
@@ -137,5 +165,6 @@ if __name__ == '__main__':
     suite2 = unittest.TestLoader().loadTestsFromTestCase(PermissionTest)
     suite3 = unittest.TestLoader().loadTestsFromTestCase(LoginTest)
     suite4 = unittest.TestLoader().loadTestsFromTestCase(EventModelTest)
-    suite = unittest.TestSuite([suite1,suite2,suite3, suite4])
+    suite5 = unittest.TestLoader().loadTestsFromTestCase(EventCreationTest)
+    suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5])
     unittest.TextTestRunner().run(suite)
