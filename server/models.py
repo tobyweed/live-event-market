@@ -80,6 +80,19 @@ class EventInfo(db.Model):
     def find_by_name(cls, name):
        return cls.query.filter_by(name = name).first()
 
+    @classmethod
+    def find_by_id(cls, id):
+        return cls.query.filter_by(id = id).first()
+
+    # @classmethod
+    # def search(cls,id):
+        #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
+        #names: returns a list of events with similar names
+        #dates: overlapping (not exclusive) dates. EX: Bob searches "may 1st-June 1st" and gets one event "april 29-may 1" and another "may 29-june 5"
+        #locations: proximity, if possible
+        #types: Compares the query list to the event list. Exact
+        #series, ticketed, private: boolean values, exact
+
 
 
 #represents users

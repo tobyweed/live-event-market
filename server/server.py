@@ -51,6 +51,7 @@ api.add_resource(endpoints.PromoterRegistration, '/promoters/registration')
 api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.AddUser, '/promoter/adduser')
 api.add_resource(endpoints.CreateEvent, '/create-event')
+api.add_resource(endpoints.OneEvent, '/event/<int:id>')
 
 #run
 if __name__ == '__main__':
