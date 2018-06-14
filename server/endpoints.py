@@ -17,6 +17,27 @@ event_schema = EventSchema()
 '''
 ================EVENT RESOURCES================
 '''
+
+# GET request which accepts a whole bunch of parameters and enters them into the search
+# class SearchEvents(Resource)
+
+#return all the data of one event_info and all of its events. Query based on id #.
+class OneEvent(Resource):
+    @jwt_required
+    def get(self, id):
+        #get the right event_info
+        event_info = EventInfo.find_by_id(id)
+        if not event_info:
+            return {'message': 'An event with that id does not exist.'}, 500
+        #serialize event_info
+        event_info_dump = event_info_schema.dump(event_info)
+
+        #return the results
+        try:
+            return event_info_dump
+        except:
+            return {'message': 'Something went wrong.'}, 500
+
 #create a new event
 class CreateEvent(Resource):
     @jwt_required

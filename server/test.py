@@ -71,6 +71,14 @@ class AuthTest(unittest.TestCase):
             }, follow_redirects=True)
 
     @classmethod
+    def getOneEvent(self, id, username, password):
+        token = self.getToken(username, password)
+        return self.app.get('/event/'+id, headers={
+            'Content-Type':'application/json',
+            'Authorization': 'Bearer {}'.format(token)
+        }, follow_redirects=True)
+
+    @classmethod
     def login(self, username, password):
         return self.app.post('/login', json={
             'username':username,
@@ -149,8 +157,13 @@ class EventModelTest(AuthTest):
 class EventCreationTest(AuthTest):
     def test_event_create(self):
         with server.app.app_context():
+            #check that the server returns our affirmative message when we use the create event endpoint
             rv = self.createEvent('test',datetime.now(),'test','test')
             assert b'Event test was created' in rv.data
+            #check that our server returns an object at oneEvent endpoint with id 1 and it is named test
+            rv1 = self.getOneEvent('1','test','test')
+            event_info = json.loads(rv1.data)
+            self.assertEqual(event_info['name'], 'test')
 
 
 '''
