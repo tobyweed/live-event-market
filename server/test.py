@@ -3,7 +3,7 @@ import server
 import json
 from flask import jsonify
 from datetime import datetime
-from endpoints import user_schema, DateTimeEncoder
+from endpoints import user_schema, event_info_schema, DateTimeEncoder
 from models import UserModel, EventInfo, Event, PromoterModel
 
 TEST_SQLALCHEMY_DATABASE_URI = 'sqlite:///test.sqlite'
@@ -174,16 +174,16 @@ class SearchTest(AuthTest):
     def test_search(self):
         with server.app.app_context():
             rv = EventInfo.search('test')
-            print(rv)
-            for i in range(len(rv)):
-                print(rv[i].name)
             self.assertIsInstance(rv[0],EventInfo)
 
 class SearchEndpointTest(AuthTest):
     def test_search_endpoint(self):
         with server.app.app_context():
             rv = self.search('test')
-            # self.assertIsInstance(rv[0],EventInfo)
+            events_from_server = json.loads(rv.data)
+            rv1 = EventInfo.search('test')
+            event_from_model = event_info_schema.dump(rv1[0])
+            self.assertEqual(events_from_server[0],event_from_model.data)
 
 
 '''
