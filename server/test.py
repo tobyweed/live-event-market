@@ -3,10 +3,18 @@ import server
 import json
 from flask import jsonify
 from datetime import datetime
-from endpoints import user_schema, event_info_schema, DateTimeEncoder
+from endpoints import user_schema, event_info_schema
 from models import UserModel, EventInfo, Event, PromoterModel
 
 TEST_SQLALCHEMY_DATABASE_URI = 'sqlite:///test.sqlite'
+
+#Encoder so that I can dump datetimes into string format
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)
+
 
 #Set up and tear down database after all tests have run
 def setUpModule():
@@ -59,6 +67,7 @@ class AuthTest(unittest.TestCase):
     def createEvent(self, name, start_date, username, password):
         token = self.getToken(username, password)
         start_date = json.dumps(start_date,cls=DateTimeEncoder)
+        end_date = '3000-11-11T18:45:10.000000'
         start_date = start_date.replace('"','')
         return self.app.post('/create-event', headers={
             'Content-Type':'application/json',
@@ -66,8 +75,14 @@ class AuthTest(unittest.TestCase):
         }, json={
             'name':name,
             'events':[
-                    {'start_date':start_date},
-                    {'start_date':'2019-11-11T18:45:10.000000'}
+                    {
+                        'start_date':'2019-11-11T18:45:10.000000',
+                        'end_date':end_date
+                    },
+                    {
+                        'start_date':'2019-11-11T18:45:10.000000',
+                        'end_date':end_date
+                    }
                 ]
             }, follow_redirects=True)
 
@@ -80,8 +95,8 @@ class AuthTest(unittest.TestCase):
         }, follow_redirects=True)
 
     @classmethod
-    def search(self, name):
-        return self.app.get('/events/'+name, follow_redirects=True)
+    def search(self, name, start_date, end_date):
+        return self.app.get('/events/'+name+'/'+start_date+'/'+end_date, follow_redirects=True)
 
     @classmethod
     def login(self, username, password):
@@ -173,18 +188,21 @@ class EventCreationTest(AuthTest):
 class SearchTest(AuthTest):
     def test_search(self):
         with server.app.app_context():
-            rv = EventInfo.search('test')
+            rv = EventInfo.search('test','2020-11-11T18:45:10.000000','2999-11-11T18:45:10.000000')
             self.assertIsInstance(rv[0],EventInfo)
 
 class SearchEndpointTest(AuthTest):
     def test_search_endpoint(self):
         with server.app.app_context():
-            rv = self.search('test')
+            rv = self.search('test','2020-11-11T18:45:10.000000','2999-11-11T18:45:10.000000')
             events_from_server = json.loads(rv.data)
-            rv1 = EventInfo.search('test')
+            rv1 = EventInfo.search('test','2020-11-11T18:45:10.000000','2999-11-11T18:45:10.000000')
             event_from_model = event_info_schema.dump(rv1[0])
             self.assertEqual(events_from_server[0],event_from_model.data)
 
+class SearchDatesTest(AuthTest):
+    def test_dates_search(self):
+        rv = EventInfo.search('test')
 
 '''
 TODO: Write tests for OneUser put, OnePromoter, AddUser,
@@ -202,4 +220,5 @@ if __name__ == '__main__':
     suite6 = unittest.TestLoader().loadTestsFromTestCase(SearchTest)
     suite7 = unittest.TestLoader().loadTestsFromTestCase(SearchEndpointTest)
     suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5, suite6, suite7])
+    # suite = unittest.TestSuite([suite8])
     unittest.TextTestRunner().run(suite)

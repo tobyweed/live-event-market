@@ -1,11 +1,11 @@
 from flask_restful import Resource, request
-from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, PromoterSchema, EventSchema, EventInfoSchema)
-from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import update
 from datetime import datetime
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 import json
 
-from flask_sqlalchemy import SQLAlchemy
+from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, PromoterSchema, EventSchema, EventInfoSchema)
 from server import db
 
 #initialize schemas
@@ -20,9 +20,12 @@ event_schema = EventSchema()
 
 # GET request which accepts a whole bunch of parameters and enters them into the search
 class SearchEvents(Resource):
-    def get(self, name):
+    def get(self, name, start_date, end_date):
+        if not name: #name is required
+            return {'message':'Please enter a search term.'}
+
         #get list of events matching the search Query
-        events = EventInfo.search(name)
+        events = EventInfo.search(name, start_date, end_date)
         if not events:
             return {'message':'There are no events matching that description. Please try something else.'}
         event_dumps = []
@@ -78,8 +81,10 @@ class CreateEvent(Resource):
         events = event_info.data['events']
         for i in range(len(events)):
             start_date = events[i]['start_date']
+            end_date = events[i]['end_date']
             new_event = Event(
-                start_date = start_date
+                start_date = start_date,
+                end_date = end_date
             )
             # append created Events to created event_info
             new_event_info.events.append(new_event)
@@ -88,15 +93,15 @@ class CreateEvent(Resource):
         promoter = PromoterModel.find_by_name(current_user_promoter)
         promoter.event_infos.append(new_event_info)
 
-        try:
-            new_event.save_to_db()
-            new_event_info.save_to_db()
-            promoter.save_to_db()
-            return {
-                'message': 'Event {} was created'.format(data['name'])
-            }
-        except:
-            return {'message': 'Something went wrong'}, 500
+        # try:
+        new_event.save_to_db()
+        new_event_info.save_to_db()
+        promoter.save_to_db()
+        return {
+            'message': 'Event {} was created'.format(data['name'])
+        }
+        # except:
+        #     return {'message': 'Something went wrong'}, 500
 
 
 
@@ -342,10 +347,3 @@ class TokenRefresh(Resource):
             'access_token': access_token,
             'refresh_token': refresh_token
         }
-
-#Encoder
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime):
-            return o.isoformat()
-        return json.JSONEncoder.default(self, o)
