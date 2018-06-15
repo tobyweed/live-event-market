@@ -5,6 +5,10 @@ node_modules
 venv
 serverenv
 .env
+whooshee
+sqlite:
+app.db
+test.sqlite
 
 # production
 /build
@@ -13,5 +17,3 @@ serverenv
 __pycache__
 .DS_Store
 *.pyc
-app.db
-test.sqlite
