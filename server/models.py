@@ -4,8 +4,9 @@ from marshmallow import Schema, fields
 from flask_whooshee import Whooshee
 # from server import whooshee
 
-db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
 whooshee = Whooshee()
+db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
+
 
 #declare schemas
 class UserSchema(Schema):
@@ -49,7 +50,7 @@ class Event(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     start_date = db.Column(db.DateTime)
-    event_name = db.Column(db.String(120), db.ForeignKey('event_info.name'))
+    event_id = db.Column(db.Integer, db.ForeignKey('event_info.id'))
 
     event_info = db.relationship("EventInfo", back_populates="events")
 
@@ -92,7 +93,6 @@ class EventInfo(db.Model):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
         query = EventInfo.query.whooshee_search(name).all()
-
         #dates: overlapping (not exclusive) dates. EX: Bob searches "may 1st-June 1st" and gets one event "april 29-may 1" and another "may 29-june 5"
         #locations: proximity, if possible
         #types: Compares the query list to the event list. Exact
