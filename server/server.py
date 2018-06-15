@@ -1,20 +1,21 @@
 import os
 from flask import Flask, jsonify
 from flask_restful import Api
-from models import db #Necessary to do it this way to avoid circular imports
-
+from models import db, whooshee
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
-
 
 app = Flask(__name__) #initialize Flask app
 app.config.from_object(os.environ['APP_SETTINGS']) #config must be defined in an envvar, ex.: "config.DevelopmentConfig"
 api = Api(app) #make an Flask_RESTful api for the app
 
+
 #configure db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db.init_app(app) #necessary to do it this way to avoid circular imports
+whooshee.init_app(app)
 
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -52,6 +53,7 @@ api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.AddUser, '/promoter/adduser')
 api.add_resource(endpoints.CreateEvent, '/create-event')
 api.add_resource(endpoints.OneEvent, '/event/<int:id>')
+api.add_resource(endpoints.SearchEvents, '/events/<string:name>')
 
 #run
 if __name__ == '__main__':

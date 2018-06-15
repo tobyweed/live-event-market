@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 
 from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
+from server import db
 
 #initialize schemas
 user_schema = UserSchema()
@@ -19,7 +19,22 @@ event_schema = EventSchema()
 '''
 
 # GET request which accepts a whole bunch of parameters and enters them into the search
-# class SearchEvents(Resource)
+class SearchEvents(Resource):
+    def get(self, name):
+        #get list of events matching the search Query
+        events = EventInfo.search(name)
+        if not events:
+            return {'message':'There are no events matching that description. Please try something else.'}
+        event_dumps = []
+        for i in range(len(events)):
+            dumped_event = event_info_schema.dump(events[i])
+            event_dumps.append(dumped_event.data)
+        # event1_dump = event_info_schema.dump(events[1])
+        # print(event_dump)
+        # print(event1_dump)
+        # event_dumps = [event_dump, event1_dump]
+        return event_dumps
+
 
 #return all the data of one event_info and all of its events. Query based on id #.
 class OneEvent(Resource):
@@ -66,9 +81,8 @@ class CreateEvent(Resource):
             new_event = Event(
                 start_date = start_date
             )
-
-        # append created Events to created event_info
-        new_event_info.events.append(new_event)
+            # append created Events to created event_info
+            new_event_info.events.append(new_event)
 
         # append create event_info to promoter of current user
         promoter = PromoterModel.find_by_name(current_user_promoter)
@@ -108,7 +122,6 @@ class OneUser(Resource):
         #get user trying to update
         username = user
         the_user = UserModel.find_by_username(username)
-
 
         edited_user = user_schema.load(data)
         if not UserModel.find_by_username(user):

@@ -30,6 +30,7 @@ class AuthTest(unittest.TestCase):
         with server.app.app_context():
             self.register('test','test')
             self.registerPromoter('test','test','test')
+            self.createEvent('test',datetime.now(),'test','test')
 
     #clean the db after every test
     @classmethod
@@ -77,6 +78,10 @@ class AuthTest(unittest.TestCase):
             'Content-Type':'application/json',
             'Authorization': 'Bearer {}'.format(token)
         }, follow_redirects=True)
+
+    @classmethod
+    def search(self, name):
+        return self.app.get('/events/'+name, follow_redirects=True)
 
     @classmethod
     def login(self, username, password):
@@ -150,7 +155,7 @@ class EventModelTest(AuthTest):
             event_info = EventInfo.find_by_name('test')
 
             #test if the event_info to event relationship is established
-            self.assertEqual(event_info.name, event.event_name)
+            self.assertEqual(event_info.id, event.event_id)
             #test if  the event_info to promoter relationship is established
             self.assertEqual(event_info.promoter_name, promoter.name)
 
@@ -158,12 +163,27 @@ class EventCreationTest(AuthTest):
     def test_event_create(self):
         with server.app.app_context():
             #check that the server returns our affirmative message when we use the create event endpoint
-            rv = self.createEvent('test',datetime.now(),'test','test')
-            assert b'Event test was created' in rv.data
+            rv = self.createEvent('test1',datetime.now(),'test','test')
+            assert b'Event test1 was created' in rv.data
             #check that our server returns an object at oneEvent endpoint with id 1 and it is named test
             rv1 = self.getOneEvent('1','test','test')
             event_info = json.loads(rv1.data)
             self.assertEqual(event_info['name'], 'test')
+
+class SearchTest(AuthTest):
+    def test_search(self):
+        with server.app.app_context():
+            rv = EventInfo.search('test')
+            print(rv)
+            for i in range(len(rv)):
+                print(rv[i].name)
+            self.assertIsInstance(rv[0],EventInfo)
+
+class SearchEndpointTest(AuthTest):
+    def test_search_endpoint(self):
+        with server.app.app_context():
+            rv = self.search('test')
+            # self.assertIsInstance(rv[0],EventInfo)
 
 
 '''
@@ -179,5 +199,7 @@ if __name__ == '__main__':
     suite3 = unittest.TestLoader().loadTestsFromTestCase(LoginTest)
     suite4 = unittest.TestLoader().loadTestsFromTestCase(EventModelTest)
     suite5 = unittest.TestLoader().loadTestsFromTestCase(EventCreationTest)
-    suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5])
+    suite6 = unittest.TestLoader().loadTestsFromTestCase(SearchTest)
+    suite7 = unittest.TestLoader().loadTestsFromTestCase(SearchEndpointTest)
+    suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5, suite6, suite7])
     unittest.TextTestRunner().run(suite)
