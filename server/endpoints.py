@@ -6,7 +6,7 @@ from datetime import datetime
 import json
 
 from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
+from server import db
 
 #initialize schemas
 user_schema = UserSchema()

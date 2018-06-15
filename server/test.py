@@ -12,9 +12,11 @@ TEST_SQLALCHEMY_DATABASE_URI = 'sqlite:///test.sqlite'
 def setUpModule():
     print("setUpModule")
     server.app.config['SQLALCHEMY_DATABASE_URI'] = TEST_SQLALCHEMY_DATABASE_URI
+    server.app.config['WHOOSHEE_MEMORY_STORAGE'] = True
     server.app.testing = True
     with server.app.app_context():
         server.db.init_app(server.app)
+        server.whooshee.init_app(server.app)
 
 def tearDownModule():
     with server.app.app_context():
@@ -30,6 +32,7 @@ class AuthTest(unittest.TestCase):
         with server.app.app_context():
             self.register('test','test')
             self.registerPromoter('test','test','test')
+            self.createEvent('test',datetime.now(),'test','test')
 
     #clean the db after every test
     @classmethod
@@ -158,12 +161,18 @@ class EventCreationTest(AuthTest):
     def test_event_create(self):
         with server.app.app_context():
             #check that the server returns our affirmative message when we use the create event endpoint
-            rv = self.createEvent('test',datetime.now(),'test','test')
-            assert b'Event test was created' in rv.data
+            rv = self.createEvent('test1',datetime.now(),'test','test')
+            assert b'Event test1 was created' in rv.data
             #check that our server returns an object at oneEvent endpoint with id 1 and it is named test
             rv1 = self.getOneEvent('1','test','test')
             event_info = json.loads(rv1.data)
             self.assertEqual(event_info['name'], 'test')
+
+class SearchTest(AuthTest):
+    def test_search(self):
+        with server.app.app_context():
+            rv = EventInfo.search('test')
+            self.assertIsInstance(rv[0],EventInfo)
 
 
 '''
@@ -179,5 +188,6 @@ if __name__ == '__main__':
     suite3 = unittest.TestLoader().loadTestsFromTestCase(LoginTest)
     suite4 = unittest.TestLoader().loadTestsFromTestCase(EventModelTest)
     suite5 = unittest.TestLoader().loadTestsFromTestCase(EventCreationTest)
-    suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5])
+    suite6 = unittest.TestLoader().loadTestsFromTestCase(SearchTest)
+    suite = unittest.TestSuite([suite1,suite2,suite3, suite4, suite5, suite6])
     unittest.TextTestRunner().run(suite)

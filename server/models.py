@@ -1,8 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
+from flask_whooshee import Whooshee
+# from server import whooshee
 
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
+whooshee = Whooshee()
 
 #declare schemas
 class UserSchema(Schema):
@@ -58,7 +61,7 @@ class Event(db.Model):
     def find_by_id(cls, id):
        return cls.query.filter_by(id = id).first()
 
-
+@whooshee.register_model('name')
 class EventInfo(db.Model):
     __tablename__ = 'event_info'
     __table_args__ = {'extend_existing': True}
@@ -84,14 +87,17 @@ class EventInfo(db.Model):
     def find_by_id(cls, id):
         return cls.query.filter_by(id = id).first()
 
-    # @classmethod
-    # def search(cls,id):
+    @classmethod
+    def search(cls,name):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
+        query = EventInfo.query.whooshee_search(name).all()
+
         #dates: overlapping (not exclusive) dates. EX: Bob searches "may 1st-June 1st" and gets one event "april 29-may 1" and another "may 29-june 5"
         #locations: proximity, if possible
         #types: Compares the query list to the event list. Exact
         #series, ticketed, private: boolean values, exact
+        return query
 
 
 
