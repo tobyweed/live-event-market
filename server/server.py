@@ -9,9 +9,8 @@ app = Flask(__name__) #initialize Flask app
 app.config.from_object(os.environ['APP_SETTINGS']) #config must be defined in an envvar, ex.: "config.DevelopmentConfig"
 api = Api(app) #make an Flask_RESTful api for the app
 
-
 #configure db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://Administrator:Summitskis6@ftmtestdb.cwkpfzwkwgvg.us-east-2.rds.amazonaws.com/lemtest'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app) #necessary to do it this way to avoid circular imports
@@ -53,7 +52,8 @@ api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.AddUser, '/promoter/adduser')
 api.add_resource(endpoints.CreateEvent, '/create-event')
 api.add_resource(endpoints.OneEvent, '/event/<int:id>')
-api.add_resource(endpoints.SearchEvents, '/events/<string:name>')
+# api.add_resource(endpoints.SearchEvents, '/events?name=<string:name>&start_date=<string:start_date>&end_date=<string:end_date>')
+api.add_resource(endpoints.SearchEvents, '/events/<string:name>/<string:start_date>/<string:end_date>')
 
 #run
 if __name__ == '__main__':

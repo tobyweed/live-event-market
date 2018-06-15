@@ -26,6 +26,7 @@ class PromoterSchema(Schema):
 
 class EventSchema(Schema):
     start_date = fields.DateTime()
+    end_date = fields.DateTime()
     event_name = fields.Str()
 
 class EventInfoSchema(Schema):
@@ -50,6 +51,7 @@ class Event(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
     event_id = db.Column(db.Integer, db.ForeignKey('event_info.id'))
 
     event_info = db.relationship("EventInfo", back_populates="events")
@@ -89,15 +91,19 @@ class EventInfo(db.Model):
         return cls.query.filter_by(id = id).first()
 
     @classmethod
-    def search(cls,name):
+    def search(cls,name,start_date,end_date):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
-        query = EventInfo.query.whooshee_search(name).all()
-        #dates: overlapping (not exclusive) dates. EX: Bob searches "may 1st-June 1st" and gets one event "april 29-may 1" and another "may 29-june 5"
+        search = EventInfo.query.whooshee_search(name)
+        #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
+        if start_date:
+            search = search.filter(Event.start_date <= start_date)
+        if end_date:
+            search = search.filter(Event.end_date >= end_date)
         #locations: proximity, if possible
         #types: Compares the query list to the event list. Exact
         #series, ticketed, private: boolean values, exact
-        return query
+        return search.all()
 
 
 
