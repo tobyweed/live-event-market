@@ -7,7 +7,7 @@ class EditAccount extends Component {
 		super(props);
 
 		this.state = {
-			showResults: false,
+			showForm: false,
 			firstName: props.userData.firstName,
 			lastName: props.userData.lastName,
 			email: props.userData.email,
@@ -17,7 +17,7 @@ class EditAccount extends Component {
 		};
 
 		this.handleChange = this.handleChange.bind(this);
-		this.handleFormSubmit = this.handleFormSubmit.bind(this);
+		this.editFormSubmit = this.props.editFormSubmit.bind(this);
 		this.onClick = this.onClick.bind(this);
 	}
 
@@ -25,10 +25,10 @@ class EditAccount extends Component {
 		return (
 			<div>
 				<button onClick={this.onClick}>Edit</button>
-				{this.state.showResults ? (
+				{this.state.showForm ? (
 					<div>
 						<h4 className="edit-account-form">Edit Your Information</h4>
-						<form onSubmit={this.handleFormSubmit}>
+						<form onSubmit={this.editFormSubmit}>
 							<input
 								className="form-item"
 								placeholder="Enter First Name"
@@ -83,6 +83,7 @@ class EditAccount extends Component {
 							<br />
 							<input className="form-submit" value="Submit" type="submit" />
 						</form>
+						<p>{this.props.editFormMessage}</p>
 						<p />
 					</div>
 				) : null}
@@ -91,11 +92,11 @@ class EditAccount extends Component {
 	}
 
 	onClick() {
-		const showing = this.state.showResults;
+		const showing = this.state.showForm;
 		if (showing) {
-			this.setState({ showResults: false });
+			this.setState({ showForm: false });
 		} else {
-			this.setState({ showResults: true });
+			this.setState({ showForm: true });
 		}
 	}
 
@@ -103,29 +104,6 @@ class EditAccount extends Component {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
-	}
-
-	handleFormSubmit(e) {
-		//Login on form submit
-		e.preventDefault();
-
-		const userData = this.props.userData;
-
-		axios
-			.put('/user/' + userData.username, {
-				firstName: this.state.firstName,
-				lastName: this.state.lastName,
-				email: this.state.email,
-				phoneNumber: this.state.phoneNumber,
-				proPic: this.state.proPic,
-				organization: this.state.organization
-			})
-			.then(res => {
-				this.props.reRender;
-			})
-			.catch(err => {
-				alert(err);
-			});
 	}
 }
 

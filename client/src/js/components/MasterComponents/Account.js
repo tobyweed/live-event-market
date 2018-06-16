@@ -13,10 +13,12 @@ class Account extends Component {
 	constructor() {
 		super();
 		this.Auth = new AuthService();
+		this.editFormSubmit = this.editFormSubmit.bind(this);
 	}
 
 	state = {
-		userData: ''
+		userData: '',
+		editFormMessage: ''
 	};
 
 	//Get user info
@@ -59,7 +61,11 @@ class Account extends Component {
 						<li>Phone #: {userData.phoneNumber}</li>
 						<li>Organization: {userData.organization}</li>
 						{userData && (
-							<EditAccount userData={userData} reRender={this.reRender} />
+							<EditAccount
+								userData={userData}
+								editFormSubmit={this.editFormSubmit}
+								editFormMessage={this.state.editFormMessage}
+							/>
 						)}
 					</ul>
 					<div>{promoterSection}</div>
@@ -80,8 +86,30 @@ class Account extends Component {
 		}
 	}
 
-	reRender() {
-		this.forceUpdate();
+	editFormSubmit(e) {
+		e.preventDefault();
+		const userData = this.state.userData;
+		//Edit the user and set the state accordingly
+		axios
+			.put('/user/' + userData.username, {
+				firstName: this.state.firstName,
+				lastName: this.state.lastName,
+				email: this.state.email,
+				phoneNumber: this.state.phoneNumber,
+				proPic: this.state.proPic,
+				organization: this.state.organization
+			})
+			.then(res => {
+				axios.get('/user/' + this.props.user.identity).then(res => {
+					this.setState({
+						userData: res.data,
+						editFormMessage: 'Your account data has been updated.'
+					});
+				});
+			})
+			.catch(err => {
+				this.setState({ editFormMessage: err });
+			});
 	}
 
 	handleLogout() {
