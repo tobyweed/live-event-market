@@ -10,7 +10,7 @@ app.config.from_object(os.environ['APP_SETTINGS']) #config must be defined in an
 api = Api(app) #make an Flask_RESTful api for the app
 
 #configure db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://Administrator:Summitskis6@ftmtestdb.cwkpfzwkwgvg.us-east-2.rds.amazonaws.com/lemtest'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app) #necessary to do it this way to avoid circular imports

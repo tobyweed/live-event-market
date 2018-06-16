@@ -32,10 +32,6 @@ class SearchEvents(Resource):
         for i in range(len(events)):
             dumped_event = event_info_schema.dump(events[i])
             event_dumps.append(dumped_event.data)
-        # event1_dump = event_info_schema.dump(events[1])
-        # print(event_dump)
-        # print(event1_dump)
-        # event_dumps = [event_dump, event1_dump]
         return event_dumps
 
 
@@ -93,15 +89,15 @@ class CreateEvent(Resource):
         promoter = PromoterModel.find_by_name(current_user_promoter)
         promoter.event_infos.append(new_event_info)
 
-        # try:
-        new_event.save_to_db()
-        new_event_info.save_to_db()
-        promoter.save_to_db()
-        return {
-            'message': 'Event {} was created'.format(data['name'])
-        }
-        # except:
-        #     return {'message': 'Something went wrong'}, 500
+        try:
+            new_event.save_to_db()
+            new_event_info.save_to_db()
+            promoter.save_to_db()
+            return {
+                'message': 'Event {} was created'.format(data['name'])
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 

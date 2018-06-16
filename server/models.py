@@ -2,7 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
 from flask_whooshee import Whooshee
-# from server import whooshee
 
 whooshee = Whooshee()
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
