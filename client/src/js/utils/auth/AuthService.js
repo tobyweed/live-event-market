@@ -14,17 +14,15 @@ class AuthService {
 				const access = res.data.access_token;
 				const refresh = res.data.refresh_token;
 				if (!!access && !!refresh) {
+					//if we got the access tokens, put them in localStorage
 					this.setAccess(res.data.access_token);
 					this.setRefresh(res.data.refresh_token);
 				} else {
-					alert('Those credentials do not exist');
+					return res.data.message; //The message from the server
 				}
-				return Promise.resolve(res);
 			})
 			.catch(err => {
-				console.log(err);
-				alert('something went wrong');
-				return 'something went wrong';
+				return err;
 			});
 	}
 
@@ -41,9 +39,18 @@ class AuthService {
 				organization: data.organization
 			})
 			.then(res => {
-				this.setAccess(res.data.access_token);
-				this.setRefresh(res.data.refresh_token);
-				return Promise.resolve(res);
+				const access = res.data.access_token;
+				const refresh = res.data.refresh_token;
+				if (!!access && !!refresh) {
+					//if we got the access tokens, put them in localStorage
+					this.setAccess(res.data.access_token);
+					this.setRefresh(res.data.refresh_token);
+				} else {
+					return res.data.message; //The message from the server
+				}
+			})
+			.catch(err => {
+				return err;
 			});
 	}
 
@@ -106,10 +113,38 @@ class AuthService {
 		localStorage.removeItem('id_refresh_token');
 	}
 
+	//get user info from their access token
 	getProfile() {
 		return decode(this.getAccess());
 	}
 
+	//set header and refresh access token if needed
+	initialize() {
+		const refresh = this.getRefresh();
+		return new Promise((resolve, reject) => {
+			if (this.loggedIn()) {
+				this.setHeader(); //Set axios header
+				resolve('axios header set');
+			} else if (!!refresh && !this.isTokenExpired(refresh)) {
+				axios.defaults.headers.common['Authorization'] = `Bearer ${refresh}`; //set the header to be the refresh token
+				axios
+					.post('/token/refresh')
+					.then(res => {
+						//refresh access token
+						this.setAccess(res.data.access_token);
+						this.setRefresh(res.data.refresh_token);
+
+						this.setHeader(); //Set axios header
+						resolve(res);
+					})
+					.catch(err => reject(err));
+			} else {
+				resolve('Not logged in');
+			}
+		});
+	}
+
+	//set axios header
 	setHeader() {
 		if (this.loggedIn()) {
 			axios.defaults.headers.common['Authorization'] =

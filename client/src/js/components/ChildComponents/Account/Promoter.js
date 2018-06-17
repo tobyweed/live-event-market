@@ -50,4 +50,4 @@ class Promoter extends Component {
 	}
 }
 
-export default withAuth(Promoter);
+export default Promoter;

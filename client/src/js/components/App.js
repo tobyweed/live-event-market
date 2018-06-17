@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import '../../css/App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+import axios from 'axios';
+import { setUser, setUserData } from '../actions.js';
 
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
@@ -13,16 +16,31 @@ import Nav from './ChildComponents/Nav';
 import Footer from './ChildComponents/Footer';
 
 class App extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.Auth = new AuthService();
 	}
 
-	state = {
-		yo: 'hi'
-	};
+	//Return user data
+	setUserData() {
+		if (this.Auth.loggedIn()) {
+			const profile = this.Auth.getProfile(); //Get the info from our jwt token
+			//now get and set userData
+			axios.get('/user/' + profile.identity).then(res => {
+				console.log(res.data);
+				this.props.dispatch(setUserData(res.data));
+			});
+		} else {
+			return ' ';
+		}
+	}
+
+	componentWillMount() {
+		this.setUserData();
+	}
 
 	render() {
+		// return this.props.userData ? (
 		return (
 			<Router>
 				<div>
@@ -35,12 +53,16 @@ class App extends Component {
 				</div>
 			</Router>
 		);
+		// ) : (
+		// 	<p>The page is loading</p>
+		// );
 	}
 }
 
-//<Route path="/Search" component={_search} />
-//<Route path="/Event" component={_event} />
-//<Route path="/User" component={_user} />
-//<Route path="/Pomoter" component={_promoter} />
+function mapStateToProps(state) {
+	return {
+		userData: state.userData
+	};
+}
 
-export default withAuth(App);
+export default connect(mapStateToProps)(App);

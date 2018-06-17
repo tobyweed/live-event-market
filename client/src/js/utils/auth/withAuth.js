@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import AuthService from './AuthService';
+import { setUser } from '../../actions.js';
 
 /*
 * This class is a Higher Order Component which is applied
@@ -13,9 +14,9 @@ export default function withAuth(AuthComponent) {
 	return class AuthWrapped extends Component {
 		constructor() {
 			super();
-			this.state = {
+			this.setState({
 				user: null
-			};
+			});
 			this.Auth = new AuthService();
 		}
 
@@ -51,15 +52,10 @@ export default function withAuth(AuthComponent) {
 		}
 
 		render() {
-			const user = this.state.user;
+			const user = this.props.user;
 			return (
 				<div>
-					{user && (
-						<AuthComponent
-							history={this.props.history}
-							user={this.state.user}
-						/>
-					)}
+					{user && <AuthComponent history={this.props.history} user={user} />}
 				</div>
 			);
 		}

@@ -10,6 +10,10 @@ class LoginForm extends Component {
 		this.Auth = new AuthService();
 	}
 
+	state = {
+		errorMessage: ''
+	};
+
 	componentWillMount() {
 		//Redirect if we are already logged in
 		if (this.Auth.loggedIn()) {
@@ -40,7 +44,7 @@ class LoginForm extends Component {
 					/>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
-				<p />
+				<p>{this.state.errorMessage}</p>
 			</div>
 		);
 	}
@@ -59,10 +63,12 @@ class LoginForm extends Component {
 			.then(res => {
 				if (this.Auth.loggedIn()) {
 					this.props.history.replace('/');
+				} else {
+					this.setState({ errorMessage: res });
 				}
 			})
 			.catch(err => {
-				alert(err);
+				this.setState({ errorMessage: err });
 			});
 	}
 }

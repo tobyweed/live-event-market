@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
 
 import Promoter from '../ChildComponents/Account/Promoter';
 import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
@@ -13,40 +14,21 @@ class Account extends Component {
 	constructor() {
 		super();
 		this.Auth = new AuthService();
-		this.editFormSubmit = this.editFormSubmit.bind(this);
-	}
-
-	state = {
-		userData: '',
-		editFormMessage: ''
-	};
-
-	//Get user info
-	componentDidMount() {
-		//If we are not logged in, redirect us to login
-		if (!this.Auth.loggedIn()) {
-			this.props.history.replace('/login');
-		}
-
-		axios.get('/user/' + this.props.user.identity).then(res => {
-			this.setState({ userData: res.data });
-		});
 	}
 
 	render() {
-		const user = this.props.user;
-		const userData = this.state.userData;
+		const userData = this.props.userData;
 
-		const promoterSection = this.state.userData.promoter_name ? (
-			<div>
-				<Promoter />
-				<PromoterAddUser />
-			</div>
-		) : (
-			<PromoterRegistration />
-		);
+		// const promoterSection = this.props.userData.promoter_name ? (
+		// 	<div>
+		// 		<Promoter />
+		// 		<PromoterAddUser />
+		// 	</div>
+		// ) : (
+		// 	<PromoterRegistration />
+		// );
 
-		if (user) {
+		if (this.props.userData) {
 			return (
 				<div className="account-page">
 					<h1>Account</h1>
@@ -54,21 +36,22 @@ class Account extends Component {
 					<ul>
 						{/* Currently just rendering a list of user info. Basically that's all there is to it
             to the account page, plus styling, editing, and promoter account creation */}
-						<li>Username: {userData.username}</li>
+						<li>Username: {this.props.userData.username}</li>
 						<li>First Name: {userData.firstName}</li>
 						<li>Last Name: {userData.lastName}</li>
 						<li>Email: {userData.email}</li>
 						<li>Phone #: {userData.phoneNumber}</li>
 						<li>Organization: {userData.organization}</li>
-						{userData && (
-							<EditAccount
-								userData={userData}
-								editFormSubmit={this.editFormSubmit}
-								editFormMessage={this.state.editFormMessage}
-							/>
-						)}
+						<EditAccount />
 					</ul>
-					<div>{promoterSection}</div>
+					this.props.userData.promoter_name ? (
+					<div>
+						<Promoter />
+						<PromoterAddUser />
+					</div>
+					) : (
+					<PromoterRegistration />
+					);
 					<div>
 						<h3>Logout</h3>
 						<button
@@ -80,36 +63,11 @@ class Account extends Component {
 						</button>
 					</div>
 				</div>
+				// )
 			);
 		} else {
-			return null;
+			return 'The page is loading...';
 		}
-	}
-
-	editFormSubmit(e) {
-		e.preventDefault();
-		const userData = this.state.userData;
-		//Edit the user and set the state accordingly
-		axios
-			.put('/user/' + userData.username, {
-				firstName: this.state.firstName,
-				lastName: this.state.lastName,
-				email: this.state.email,
-				phoneNumber: this.state.phoneNumber,
-				proPic: this.state.proPic,
-				organization: this.state.organization
-			})
-			.then(res => {
-				axios.get('/user/' + this.props.user.identity).then(res => {
-					this.setState({
-						userData: res.data,
-						editFormMessage: 'Your account data has been updated.'
-					});
-				});
-			})
-			.catch(err => {
-				this.setState({ editFormMessage: err });
-			});
 	}
 
 	handleLogout() {
@@ -118,4 +76,10 @@ class Account extends Component {
 	}
 }
 
-export default withAuth(Account);
+function mapStateToProps(state) {
+	return {
+		userData: state.userData
+	};
+}
+
+export default connect(mapStateToProps)(Account);
