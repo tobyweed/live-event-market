@@ -1,10 +1,20 @@
-const SET_USER = 'SET_USER';
-const SET_USER_DATA = 'SET_USER_DATA';
+import axios from 'axios';
+import AuthService from './utils/auth/AuthService';
 
-export function setUser(profile) {
-	return { type: SET_USER, user: profile };
+const Auth = new AuthService();
+
+const SET_USER_DATA = 'SET_USER_DATA';
+const SET_PROMOTER_DATA = 'SET_PROMOTER_DATA';
+const REFRESH_DATA = 'REFRESH_DATA';
+
+export function setPromoterData(promoterData) {
+	return { type: SET_PROMOTER_DATA, promoterData: promoterData };
 }
 
 export function setUserData(userData) {
 	return { type: SET_USER_DATA, userData: userData };
+}
+
+export function refreshData(data) {
+	return { type: REFRESH_DATA, data: data };
 }

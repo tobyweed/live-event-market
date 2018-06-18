@@ -7,7 +7,6 @@ import PromoterRegistration from '../ChildComponents/Account/PromoterRegistratio
 import PromoterAddUser from '../ChildComponents/Account/PromoterAddUser';
 import EditAccount from '../ChildComponents/Account/EditAccount';
 
-import withAuth from '../../utils/auth/withAuth';
 import AuthService from '../../utils/auth/AuthService';
 
 class Account extends Component {
@@ -18,17 +17,11 @@ class Account extends Component {
 
 	render() {
 		const userData = this.props.userData;
+		const promoterData = this.props.promoterData;
 
-		// const promoterSection = this.props.userData.promoter_name ? (
-		// 	<div>
-		// 		<Promoter />
-		// 		<PromoterAddUser />
-		// 	</div>
-		// ) : (
-		// 	<PromoterRegistration />
-		// );
-
-		if (this.props.userData) {
+		console.log(promoterData);
+		console.log(userData);
+		if (this.props.userData && this.props.promoterData) {
 			return (
 				<div className="account-page">
 					<h1>Account</h1>
@@ -43,15 +36,17 @@ class Account extends Component {
 						<li>Phone #: {userData.phoneNumber}</li>
 						<li>Organization: {userData.organization}</li>
 						<EditAccount />
+						{this.props.promoterData ? (
+							<div>
+								<Promoter />
+								<PromoterAddUser />
+							</div>
+						) : (
+							<div>
+								<PromoterRegistration />
+							</div>
+						)}
 					</ul>
-					this.props.userData.promoter_name ? (
-					<div>
-						<Promoter />
-						<PromoterAddUser />
-					</div>
-					) : (
-					<PromoterRegistration />
-					);
 					<div>
 						<h3>Logout</h3>
 						<button
@@ -63,7 +58,6 @@ class Account extends Component {
 						</button>
 					</div>
 				</div>
-				// )
 			);
 		} else {
 			return 'The page is loading...';
@@ -78,7 +72,8 @@ class Account extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData
+		userData: state.userData,
+		promoterData: state.promoterData
 	};
 }
 

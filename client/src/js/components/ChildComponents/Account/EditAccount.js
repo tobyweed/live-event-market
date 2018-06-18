@@ -148,7 +148,8 @@ class EditAccount extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData
+		userData: state.userData,
+		promoterData: state.promoterData
 	};
 }
 

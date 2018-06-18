@@ -245,9 +245,9 @@ class PromoterRegistration(Resource):
 
         try:
             new_promoter.save_to_db()
-            return {
-                'message': 'Promoter {} was created'.format( promoter.data['name'])
-            }
+            ret = promoter_schema.dump(new_promoter)
+            print(ret.data)
+            return ret.data
         except:
             return {'message': 'Something went wrong'}, 500
 

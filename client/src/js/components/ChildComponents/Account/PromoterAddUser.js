@@ -52,4 +52,4 @@ class PromoterAddUser extends Component {
 	}
 }
 
-export default withAuth(PromoterAddUser);
+export default PromoterAddUser;

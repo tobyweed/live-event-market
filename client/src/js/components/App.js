@@ -3,7 +3,7 @@ import '../../css/App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { setUser, setUserData } from '../actions.js';
+import { refreshData } from '../actions.js';
 
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
@@ -21,22 +21,11 @@ class App extends Component {
 		this.Auth = new AuthService();
 	}
 
-	//Return user data
-	setUserData() {
-		if (this.Auth.loggedIn()) {
-			const profile = this.Auth.getProfile(); //Get the info from our jwt token
-			//now get and set userData
-			axios.get('/user/' + profile.identity).then(res => {
-				console.log(res.data);
-				this.props.dispatch(setUserData(res.data));
-			});
-		} else {
-			return ' ';
-		}
-	}
-
 	componentWillMount() {
-		this.setUserData();
+		//get user and promoter data in an object from Auth
+		this.Auth.getData().then(res => {
+			this.props.dispatch(refreshData(res)); //add that to redux state
+		});
 	}
 
 	render() {
@@ -61,7 +50,8 @@ class App extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData
+		userData: state.userData,
+		promoterData: state.promoterData
 	};
 }
 

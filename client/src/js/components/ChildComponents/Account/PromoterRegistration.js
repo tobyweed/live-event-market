@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { setPromoterData } from '../../../actions';
 
 import withAuth from '../../../utils/auth/withAuth';
 
@@ -9,6 +11,10 @@ class PromoterRegistration extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 	}
+
+	state = {
+		errorMessage: ''
+	};
 
 	render() {
 		return (
@@ -24,6 +30,7 @@ class PromoterRegistration extends Component {
 					/>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
+				{this.state.errorMessage}
 			</div>
 		);
 	}
@@ -42,10 +49,23 @@ class PromoterRegistration extends Component {
 			.post('/promoters/registration', {
 				name: this.state.name
 			})
+			.then(res => {
+				console.log(res.data);
+				if (res.status === 200) {
+					this.props.dispatch(setPromoterData(res.data));
+				} else {
+					this.setState({ errorMessage: res.data });
+				}
+			})
 			.catch(err => {
-				alert(err);
+				this.setState({ errorMessage: err });
 			});
 	}
 }
+function mapStateToProps(state) {
+	return {
+		promoterData: state.promoterData
+	};
+}
 
-export default withAuth(PromoterRegistration);
+export default connect(mapStateToProps)(PromoterRegistration);

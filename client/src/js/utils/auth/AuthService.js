@@ -144,6 +144,28 @@ class AuthService {
 		});
 	}
 
+	//return user and promoter data in a single object
+	getData() {
+		let data = {};
+		return new Promise((resolve, reject) => {
+			if (this.loggedIn()) {
+				const profile = this.getProfile(); //Get the info from our jwt token
+				//now get and set userData
+				axios.get('/user/' + profile.identity).then(res => {
+					data.userData = res.data;
+					axios.get('/promoter/' + profile.identity).then(res => {
+						data.promoterData = res.data;
+						resolve(data);
+					});
+				});
+			} else {
+				data.userData = null;
+				data.promoterData = null;
+				resolve(data);
+			}
+		});
+	}
+
 	//set axios header
 	setHeader() {
 		if (this.loggedIn()) {
@@ -159,5 +181,4 @@ refresh token functionality.
 
 localStorage.setItem('id_access_token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwOTZlMzhiNC01NGNhLTQ4ZjYtYjA2Mi02MjY1NGMxNzBkN2MiLCJleHAiOjE1Mjc5NjQ2MjksImZyZXNoIjpmYWxzZSwiaWF0IjoxNTI3OTYzNzI5LCJ0eXBlIjoiYWNjZXNzIiwibmJmIjoxNTI3OTYzNzI5LCJpZGVudGl0eSI6InRlc3QifQ.Eg5je9u-vQNT1vAl33j-wlZ7lBB5ObzymntdLUV-qEI');
 */
-
 export default AuthService;
