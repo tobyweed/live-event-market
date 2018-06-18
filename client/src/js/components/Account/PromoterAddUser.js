@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-
-import withAuth from '../../utils/auth/withAuth';
+import { addUser } from '../../actions';
+import { connect } from 'react-redux';
 
 class PromoterAddUser extends Component {
 	constructor() {
@@ -9,6 +9,10 @@ class PromoterAddUser extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 	}
+
+	state = {
+		errorMessage: ''
+	};
 
 	render() {
 		return (
@@ -28,6 +32,7 @@ class PromoterAddUser extends Component {
 					/>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
+				{this.state.errorMessage}
 			</div>
 		);
 	}
@@ -41,15 +46,32 @@ class PromoterAddUser extends Component {
 	handleFormSubmit(e) {
 		//Login on form submit
 		e.preventDefault();
+		const newUserUsername = this.state.username;
 
 		axios
 			.post('/promoter/adduser', {
-				username: this.state.username
+				username: newUserUsername
+			})
+			.then(res => {
+				if (
+					res.data.message ==
+					'User ' + newUserUsername + ' was added to your promoter account.'
+				) {
+					this.props.dispatch(addUser(newUserUsername));
+				}
+				this.setState({ errorMessage: res.data.message });
 			})
 			.catch(err => {
-				alert(err);
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }
 
-export default PromoterAddUser;
+function mapStateToProps(state) {
+	return {
+		promoterData: state.promoterData
+	};
+}
+
+export default connect(mapStateToProps)(PromoterAddUser);

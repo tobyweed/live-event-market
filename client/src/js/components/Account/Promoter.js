@@ -2,20 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-import withAuth from '../../utils/auth/withAuth';
-
 class Promoter extends Component {
-	// state = {
-	// 	promoterData: ''
-	// };
-
-	//Get promoter info
-	// componentDidMount() {
-	// 	axios.get('/promoter/' + this.props.userData.username).then(res => {
-	// 		this.setState({ promoterData: res.data });
-	// 	});
-	// }
-
 	render() {
 		const users = this.props.promoterData.users;
 

@@ -6,7 +6,6 @@ import axios from 'axios';
 import { refreshData } from '../actions.js';
 
 import AuthService from '../utils/auth/AuthService';
-import withAuth from '../utils/auth/withAuth';
 
 import LoginForm from './Auth/LoginForm';
 import RegistrationForm from './Auth/RegistrationForm';
@@ -16,20 +15,7 @@ import Nav from './Nav/Nav';
 import Footer from './Nav/Footer';
 
 class App extends Component {
-	// constructor(props) {
-	// 	super(props);
-	// 	this.Auth = new AuthService();
-	// }
-
-	componentWillMount() {
-		// // get user and promoter data in an object from Auth
-		// this.Auth.getData().then(res => {
-		// 	this.props.dispatch(refreshData(res)); //add that to redux state
-		// });
-	}
-
 	render() {
-		// return this.props.userData ? (
 		return (
 			<Router>
 				<div>
@@ -42,9 +28,6 @@ class App extends Component {
 				</div>
 			</Router>
 		);
-		// ) : (
-		// 	<p>The page is loading</p>
-		// );
 	}
 }
 

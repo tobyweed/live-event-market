@@ -20,17 +20,12 @@ class Account extends Component {
 		const userData = this.props.userData;
 		const promoterData = this.props.promoterData;
 
-		console.log(userData);
-		console.log(promoterData);
-
 		if (this.props.userData) {
 			return (
 				<div className="account-page">
 					<h1>Account</h1>
 					<h3>Details</h3>
 					<ul>
-						{/* Currently just rendering a list of user info. Basically that's all there is to it
-            to the account page, plus styling, editing, and promoter account creation */}
 						<li>Username: {userData.username}</li>
 						<li>First Name: {userData.firstName}</li>
 						<li>Last Name: {userData.lastName}</li>
@@ -62,7 +57,7 @@ class Account extends Component {
 				</div>
 			);
 		} else {
-			return 'The page is loading...';
+			return "We're sorry, it appears that we can't find your account information. Please log out and try again.";
 		}
 	}
 

@@ -192,6 +192,9 @@ class AddUser(Resource):
         #get invited user
         invited_user_name = data['username']
         invited_user = UserModel.find_by_username(invited_user_name)
+
+        if not invited_user:
+            return {'message': 'That user does not exist.'}
         #get current user
         current_user_name = get_jwt_identity()
         current_user = UserModel.find_by_username(current_user_name)
@@ -202,10 +205,10 @@ class AddUser(Resource):
         promoter_name = current_user.promoter_name
         promoter = PromoterModel.find_by_name(promoter_name)
         if not promoter:
-            return {'message': 'You cannot add other users to your promoter account if you don\'t have one'}, 500
+            return {'message': 'You cannot add other users to your promoter account if you don\'t have one.'}
 
         if PromoterModel.find_by_name(invited_user.promoter_name):
-            return {'message': 'That user is already part of a promoter account'}, 500
+            return {'message': 'That user is already part of a promoter account.'}
 
 
         #add the user
@@ -213,10 +216,10 @@ class AddUser(Resource):
         try:
             promoter.save_to_db()
             return {
-                'message': 'User {} was added to your promoter account'.format(invited_user_name)
+                'message': 'User {} was added to your promoter account.'.format(invited_user_name)
             }
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'message': 'Something went wrong.'}, 500
 
 
 #register a new promoter
@@ -231,11 +234,11 @@ class PromoterRegistration(Resource):
 
         #do not process request if a promoter with that name already exists
         if PromoterModel.find_by_name(promoter.data['name']):
-            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}, 400
+            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}
 
         #do not process request if this user already has an associated promoter
         if user.promoter_name:
-            return {'message': 'You are already associated with a promoter account'}, 400
+            return {'message': 'You are already associated with a promoter account'}
 
         new_promoter = PromoterModel(
             name = promoter.data['name']
@@ -246,7 +249,6 @@ class PromoterRegistration(Resource):
         try:
             new_promoter.save_to_db()
             ret = promoter_schema.dump(new_promoter)
-            print(ret.data)
             return ret.data
         except:
             return {'message': 'Something went wrong'}, 500

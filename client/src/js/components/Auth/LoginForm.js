@@ -66,7 +66,6 @@ class LoginForm extends Component {
 					// get user and promoter data in an object from Auth
 					this.Auth.getData().then(res => {
 						this.props.dispatch(refreshData(res)); //add that to redux state
-						console.log(res);
 						this.props.history.replace('/');
 					});
 				} else {
@@ -74,7 +73,8 @@ class LoginForm extends Component {
 				}
 			})
 			.catch(err => {
-				this.setState({ errorMessage: err });
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }

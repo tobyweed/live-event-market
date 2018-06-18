@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { setPromoterData } from '../../actions';
-
-import withAuth from '../../utils/auth/withAuth';
+import { setPromoterData, updateUser } from '../../actions';
 
 class PromoterRegistration extends Component {
 	constructor() {
@@ -50,15 +48,16 @@ class PromoterRegistration extends Component {
 				name: this.state.name
 			})
 			.then(res => {
-				console.log(res);
-				if (res.status === 200) {
+				if (res.data.name === this.state.name) {
 					this.props.dispatch(setPromoterData(res.data));
+					this.props.dispatch(updateUser('promoter_name', res.data.name));
 				} else {
-					this.setState({ errorMessage: res });
+					this.setState({ errorMessage: res.data.message });
 				}
 			})
 			.catch(err => {
-				this.setState({ errorMessage: err });
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }

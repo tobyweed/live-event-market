@@ -121,7 +121,8 @@ class RegistrationForm extends Component {
 				}
 			})
 			.catch(err => {
-				this.setState({ errorMessage: err });
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }
