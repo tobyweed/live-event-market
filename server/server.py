@@ -52,8 +52,8 @@ api.add_resource(endpoints.OnePromoter, '/promoter/<string:user>')
 api.add_resource(endpoints.AddUser, '/promoter/adduser')
 api.add_resource(endpoints.CreateEvent, '/create-event')
 api.add_resource(endpoints.OneEvent, '/event/<int:id>')
-# api.add_resource(endpoints.SearchEvents, '/events?name=<string:name>&start_date=<string:start_date>&end_date=<string:end_date>')
-api.add_resource(endpoints.SearchEvents, '/events/<string:name>/<string:start_date>/<string:end_date>')
+api.add_resource(endpoints.SearchEvents, '/search-events')
+# api.add_resource(endpoints.SearchEvents, '/events/<string:name>/<string:start_date>/<string:end_date>')
 
 #run
 if __name__ == '__main__':

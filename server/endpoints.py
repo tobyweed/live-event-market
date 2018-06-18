@@ -21,9 +21,14 @@ event_schema = EventSchema()
 
 # GET request which accepts a whole bunch of parameters and enters them into the search
 class SearchEvents(Resource):
-    def get(self, name, start_date, end_date):
-        if not name: #name is required
-            return {'message':'Please enter a search term.'}
+    def get(self):
+        args = request.args
+        print(args)
+        name = args['name']
+        start_date = args['start_date']
+        end_date = args['end_date']
+        # if not name: #name is required
+        #     return {'message':'Please enter a search term.'}
 
         #get list of events matching the search Query
         events = EventInfo.search(name, start_date, end_date)
