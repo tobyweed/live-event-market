@@ -3,10 +3,10 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import { clearUserData } from '../../actions';
 
-import Promoter from '../ChildComponents/Account/Promoter';
-import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
-import PromoterAddUser from '../ChildComponents/Account/PromoterAddUser';
-import EditAccount from '../ChildComponents/Account/EditAccount';
+import Promoter from '../Account/Promoter';
+import PromoterRegistration from '../Account/PromoterRegistration';
+import PromoterAddUser from '../Account/PromoterAddUser';
+import EditAccount from '../Account/EditAccount';
 
 import AuthService from '../../utils/auth/AuthService';
 
@@ -20,9 +20,10 @@ class Account extends Component {
 		const userData = this.props.userData;
 		const promoterData = this.props.promoterData;
 
-		console.log(promoterData);
 		console.log(userData);
-		if (this.props.userData && this.props.promoterData) {
+		console.log(promoterData);
+
+		if (this.props.userData) {
 			return (
 				<div className="account-page">
 					<h1>Account</h1>
@@ -30,14 +31,14 @@ class Account extends Component {
 					<ul>
 						{/* Currently just rendering a list of user info. Basically that's all there is to it
             to the account page, plus styling, editing, and promoter account creation */}
-						<li>Username: {this.props.userData.username}</li>
+						<li>Username: {userData.username}</li>
 						<li>First Name: {userData.firstName}</li>
 						<li>Last Name: {userData.lastName}</li>
 						<li>Email: {userData.email}</li>
 						<li>Phone #: {userData.phoneNumber}</li>
 						<li>Organization: {userData.organization}</li>
 						<EditAccount />
-						{this.props.promoterData ? (
+						{promoterData.name ? (
 							<div>
 								<Promoter />
 								<PromoterAddUser />
@@ -74,8 +75,8 @@ class Account extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData,
-		promoterData: state.promoterData
+		userData: state.idData.userData,
+		promoterData: state.idData.promoterData
 	};
 }
 

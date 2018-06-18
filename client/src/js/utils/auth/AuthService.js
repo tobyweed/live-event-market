@@ -154,14 +154,15 @@ class AuthService {
 			if (this.loggedIn()) {
 				const profile = this.getProfile(); //Get the info from our jwt token
 				//now get and set userData
-				axios.get('/user/' + profile.identity).then(res => {
-					data.userData = res.data;
-					axios.get('/promoter/' + profile.identity).then(res => {
-						data.promoterData = res.data;
-						console.log(data);
-						resolve(data);
-					});
-				});
+				this.initialize().then(
+					axios.get('/user/' + profile.identity).then(res => {
+						data.userData = res.data;
+						axios.get('/promoter/' + profile.identity).then(res => {
+							data.promoterData = res.data;
+							resolve(data);
+						});
+					})
+				);
 			} else {
 				data.userData = null;
 				data.promoterData = null;

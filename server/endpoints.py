@@ -231,11 +231,11 @@ class PromoterRegistration(Resource):
 
         #do not process request if a promoter with that name already exists
         if PromoterModel.find_by_name(promoter.data['name']):
-            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}
+            return {'message': 'Promoter {} already exists'. format(promoter.data['name'])}, 400
 
         #do not process request if this user already has an associated promoter
         if user.promoter_name:
-            return {'message': 'You are already associated with a promoter account'}
+            return {'message': 'You are already associated with a promoter account'}, 400
 
         new_promoter = PromoterModel(
             name = promoter.data['name']

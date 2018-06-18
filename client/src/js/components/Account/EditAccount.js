@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import '../../../../css/App.css';
+import '../../../css/App.css';
 import { connect } from 'react-redux';
-import { setUserData } from '../../../actions.js';
+import { setUserData } from '../../actions.js';
 
 class EditAccount extends Component {
 	constructor(props) {
@@ -148,8 +148,8 @@ class EditAccount extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData,
-		promoterData: state.promoterData
+		userData: state.idData.userData,
+		promoterData: state.idData.promoterData
 	};
 }
 

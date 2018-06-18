@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-import FrontPage from '../ChildComponents/Home/FrontPage';
-import About from '../ChildComponents/Home/About';
+import FrontPage from './FrontPage';
+import About from './About';
 
 class Home extends Component {
 	render() {

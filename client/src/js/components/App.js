@@ -8,12 +8,12 @@ import { refreshData } from '../actions.js';
 import AuthService from '../utils/auth/AuthService';
 import withAuth from '../utils/auth/withAuth';
 
-import LoginForm from './ChildComponents/LoginForm';
-import RegistrationForm from './ChildComponents/RegistrationForm';
-import Home from './MasterComponents/Home.js';
-import Account from './MasterComponents/Account';
-import Nav from './ChildComponents/Nav';
-import Footer from './ChildComponents/Footer';
+import LoginForm from './Auth/LoginForm';
+import RegistrationForm from './Auth/RegistrationForm';
+import Home from './Home/Home.js';
+import Account from './Account/Account';
+import Nav from './Nav/Nav';
+import Footer from './Nav/Footer';
 
 class App extends Component {
 	// constructor(props) {
@@ -50,8 +50,8 @@ class App extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData,
-		promoterData: state.promoterData
+		userData: state.idData.userData,
+		promoterData: state.idData.promoterData
 	};
 }
 

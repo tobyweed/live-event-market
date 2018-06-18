@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import '../../../../css/About.css';
-import videoimg from '../../../../images/video.png';
+import '../../../css/About.css';
+import videoimg from '../../../images/video.png';
 
 class About extends Component {
 	render() {

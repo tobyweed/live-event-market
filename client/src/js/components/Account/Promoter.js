@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-import withAuth from '../../../utils/auth/withAuth';
+import withAuth from '../../utils/auth/withAuth';
 
 class Promoter extends Component {
 	// state = {
@@ -48,8 +48,8 @@ class Promoter extends Component {
 
 function mapStateToProps(state) {
 	return {
-		userData: state.userData,
-		promoterData: state.promoterData
+		userData: state.idData.userData,
+		promoterData: state.idData.promoterData
 	};
 }
 

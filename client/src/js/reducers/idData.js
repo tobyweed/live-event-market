@@ -3,12 +3,12 @@ const initialState = {
 	promoterData: null
 };
 
-const userData = (state = initialState, action) => {
+const idData = (state = initialState, action) => {
 	switch (action.type) {
 		case 'REFRESH_DATA':
 			return {
-				userData: action.data.userData,
-				promoterData: action.data.promoterData
+				promoterData: action.data.promoterData,
+				userData: action.data.userData
 			};
 		case 'SET_USER_DATA':
 			return {
@@ -30,4 +30,4 @@ const userData = (state = initialState, action) => {
 	}
 };
 
-export default userData;
+export default idData;

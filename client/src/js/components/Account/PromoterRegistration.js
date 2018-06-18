@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { setPromoterData } from '../../../actions';
+import { setPromoterData } from '../../actions';
 
-import withAuth from '../../../utils/auth/withAuth';
+import withAuth from '../../utils/auth/withAuth';
 
 class PromoterRegistration extends Component {
 	constructor() {
@@ -50,11 +50,11 @@ class PromoterRegistration extends Component {
 				name: this.state.name
 			})
 			.then(res => {
-				console.log(res.data);
+				console.log(res);
 				if (res.status === 200) {
 					this.props.dispatch(setPromoterData(res.data));
 				} else {
-					this.setState({ errorMessage: res.data });
+					this.setState({ errorMessage: res });
 				}
 			})
 			.catch(err => {
@@ -62,6 +62,7 @@ class PromoterRegistration extends Component {
 			});
 	}
 }
+
 function mapStateToProps(state) {
 	return {
 		promoterData: state.promoterData
