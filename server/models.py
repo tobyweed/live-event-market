@@ -19,6 +19,17 @@ class UserSchema(Schema):
     organization = fields.Str(missing=None)
     promoter_name = fields.Str()
 
+#userschema without the password, used to send user information back and forth from the client
+class UserSchemaWithoutPass(Schema):
+    username = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    firstName = fields.Str(missing=None)
+    lastName = fields.Str(missing=None)
+    email = fields.Str(missing=None)
+    phoneNumber = fields.Str(missing=None)
+    proPic = fields.Str(missing=None)
+    organization = fields.Str(missing=None)
+    promoter_name = fields.Str()
+
 class PromoterSchema(Schema):
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
     users = fields.Nested(UserSchema, only=['username'], many=True)

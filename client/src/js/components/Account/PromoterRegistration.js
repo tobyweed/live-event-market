@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-
-import withAuth from '../../../utils/auth/withAuth';
+import { connect } from 'react-redux';
+import { setPromoterData, updateUser } from '../../actions';
 
 class PromoterRegistration extends Component {
 	constructor() {
@@ -9,6 +9,10 @@ class PromoterRegistration extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 	}
+
+	state = {
+		errorMessage: ''
+	};
 
 	render() {
 		return (
@@ -24,6 +28,7 @@ class PromoterRegistration extends Component {
 					/>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
+				{this.state.errorMessage}
 			</div>
 		);
 	}
@@ -42,10 +47,25 @@ class PromoterRegistration extends Component {
 			.post('/promoters/registration', {
 				name: this.state.name
 			})
+			.then(res => {
+				if (res.data.name === this.state.name) {
+					this.props.dispatch(setPromoterData(res.data));
+					this.props.dispatch(updateUser('promoter_name', res.data.name));
+				} else {
+					this.setState({ errorMessage: res.data.message });
+				}
+			})
 			.catch(err => {
-				alert(err);
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }
 
-export default withAuth(PromoterRegistration);
+function mapStateToProps(state) {
+	return {
+		promoterData: state.promoterData
+	};
+}
+
+export default connect(mapStateToProps)(PromoterRegistration);

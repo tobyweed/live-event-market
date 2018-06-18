@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import '../../../../css/FrontPage.css';
-import videoimg from '../../../../images/video.png';
+import '../../../css/FrontPage.css';
+import videoimg from '../../../images/video.png';
 
 class FrontPage extends Component {
 	render() {

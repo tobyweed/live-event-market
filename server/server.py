@@ -24,7 +24,7 @@ jwt = JWTManager(app)
 #create all db tables
 @app.before_first_request
 def create_tables():
-    from models import UserModel, RevokedTokenModel, PromoterModel
+    from models import UserModel, RevokedTokenModel, PromoterModel, EventInfo, Event
     db.create_all()
 
 #support jwt blacklisting for logouts

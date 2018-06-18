@@ -5,11 +5,12 @@ from datetime import datetime
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 import json
 
-from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, PromoterSchema, EventSchema, EventInfoSchema)
+from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, UserSchemaWithoutPass, PromoterSchema, EventSchema, EventInfoSchema)
 from server import db
 
 #initialize schemas
 user_schema = UserSchema()
+user_schema_without_pass = UserSchemaWithoutPass()
 promoter_schema = PromoterSchema()
 event_info_schema = EventInfoSchema()
 event_schema = EventSchema()
@@ -113,7 +114,7 @@ class OneUser(Resource):
         result = UserModel.find_by_username(user)
 
         if(user == current_user):
-            return user_schema.dump(result)
+            return user_schema_without_pass.dump(result)
         else:
             return {'message': 'You are not authorized to access this information.'}
     @jwt_required
@@ -124,7 +125,7 @@ class OneUser(Resource):
         username = user
         the_user = UserModel.find_by_username(username)
 
-        edited_user = user_schema.load(data)
+        edited_user = user_schema_without_pass.load(data)
         if not UserModel.find_by_username(user):
             return {'message': 'User {} does not exist'. format(user)}
 
@@ -142,11 +143,10 @@ class OneUser(Resource):
         )
 
         try:
+            ret = user_schema_without_pass.dump(data)
             db.session.execute(new_user)
             db.session.commit()
-            return {
-                'message': 'User {} was updated'.format(user)
-            }
+            return ret
         except:
             return {'message': 'Something went wrong'}, 500
 
@@ -192,6 +192,9 @@ class AddUser(Resource):
         #get invited user
         invited_user_name = data['username']
         invited_user = UserModel.find_by_username(invited_user_name)
+
+        if not invited_user:
+            return {'message': 'That user does not exist.'}
         #get current user
         current_user_name = get_jwt_identity()
         current_user = UserModel.find_by_username(current_user_name)
@@ -202,10 +205,10 @@ class AddUser(Resource):
         promoter_name = current_user.promoter_name
         promoter = PromoterModel.find_by_name(promoter_name)
         if not promoter:
-            return {'message': 'You cannot add other users to your promoter account if you don\'t have one'}, 500
+            return {'message': 'You cannot add other users to your promoter account if you don\'t have one.'}
 
         if PromoterModel.find_by_name(invited_user.promoter_name):
-            return {'message': 'That user is already part of a promoter account'}, 500
+            return {'message': 'That user is already part of a promoter account.'}
 
 
         #add the user
@@ -213,10 +216,10 @@ class AddUser(Resource):
         try:
             promoter.save_to_db()
             return {
-                'message': 'User {} was added to your promoter account'.format(invited_user_name)
+                'message': 'User {} was added to your promoter account.'.format(invited_user_name)
             }
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'message': 'Something went wrong.'}, 500
 
 
 #register a new promoter
@@ -245,9 +248,8 @@ class PromoterRegistration(Resource):
 
         try:
             new_promoter.save_to_db()
-            return {
-                'message': 'Promoter {} was created'.format( promoter.data['name'])
-            }
+            ret = promoter_schema.dump(new_promoter)
+            return ret.data
         except:
             return {'message': 'Something went wrong'}, 500
 
@@ -262,7 +264,7 @@ class UserRegistration(Resource):
         data = request.get_json()
         user = user_schema.load(data)
         if UserModel.find_by_username(data['username']):
-            return {'message': 'User {} already exists'. format(data['username'])}
+            return {'message': 'User {} already exists.'. format(data['username'])}
 
         new_user = UserModel(
             username = user.data['username'],
@@ -280,12 +282,12 @@ class UserRegistration(Resource):
             access_token = create_access_token(identity = data['username'])
             refresh_token = create_refresh_token(identity = data['username'])
             return {
-                'message': 'User {} was created'.format( data['username']),
+                'message': 'User {} was created.'.format( data['username']),
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }
         except:
-            return {'message': 'Something went wrong'}, 500
+            return {'message': 'Something went wrong.'}, 500
 
 #log in with a username and password
 class UserLogin(Resource):
@@ -294,18 +296,21 @@ class UserLogin(Resource):
         user = user_schema.load(data)
         current_user = UserModel.find_by_username(data['username'])
         if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
+            return {'message': 'User {} doesn\'t exist.'.format(data['username'])}
 
         if UserModel.verify_hash(data['password'], current_user.password):
-            access_token = create_access_token(identity = data['username'])
-            refresh_token = create_refresh_token(identity = data['username'])
-            return {
-                'message': 'Logged in as {}'.format(current_user.username),
-                'access_token': access_token,
-                'refresh_token': refresh_token
-                }
+            try:
+                access_token = create_access_token(identity = data['username'])
+                refresh_token = create_refresh_token(identity = data['username'])
+                return {
+                    'message': 'Logged in as {}'.format(current_user.username),
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                    }
+            except:
+                return { 'message': 'Something went wrong.' }, 500
         else:
-            return {'message': 'Wrong credentials'}
+            return {'message': 'Wrong password.'}
 
 
 #THE BELOW ROUTES ARE NOT TESTED OR IMPLEMENTED ON THE CLIENT YET

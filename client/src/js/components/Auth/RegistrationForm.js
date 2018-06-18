@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
+import { refreshData } from '../../actions';
 
-class LoginForm extends Component {
+class RegistrationForm extends Component {
 	constructor() {
 		super();
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 		this.Auth = new AuthService();
 	}
+
+	state = {
+		errorMessage: ''
+	};
 
 	componentWillMount() {
 		//Redirect if we are already logged in
@@ -86,7 +92,7 @@ class LoginForm extends Component {
 					<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
-				<p />
+				<p>{this.state.errorMessage}</p>
 			</div>
 		);
 	}
@@ -104,13 +110,27 @@ class LoginForm extends Component {
 		this.Auth.register(this.state)
 			.then(res => {
 				if (this.Auth.loggedIn()) {
-					this.props.history.replace('/');
+					// get user and promoter data in an object from Auth
+					this.Auth.getData().then(res => {
+						this.props.dispatch(refreshData(res)); //add that to redux state
+						console.log(res);
+						this.props.history.replace('/');
+					});
+				} else {
+					this.setState({ errorMessage: res });
 				}
 			})
 			.catch(err => {
-				alert(err);
+				console.log(err);
+				this.setState({ errorMessage: 'Something went wrong.' });
 			});
 	}
 }
 
-export default LoginForm;
+function mapStateToProps(state) {
+	return {
+		username: state.username
+	};
+}
+
+export default connect(mapStateToProps)(RegistrationForm);
