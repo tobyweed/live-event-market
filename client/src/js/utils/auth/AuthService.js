@@ -146,7 +146,10 @@ class AuthService {
 
 	//return user and promoter data in a single object
 	getData() {
-		let data = {};
+		let data = {
+			userData: null,
+			promoterData: null
+		};
 		return new Promise((resolve, reject) => {
 			if (this.loggedIn()) {
 				const profile = this.getProfile(); //Get the info from our jwt token
@@ -155,6 +158,7 @@ class AuthService {
 					data.userData = res.data;
 					axios.get('/promoter/' + profile.identity).then(res => {
 						data.promoterData = res.data;
+						console.log(data);
 						resolve(data);
 					});
 				});

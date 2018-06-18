@@ -16,16 +16,16 @@ import Nav from './ChildComponents/Nav';
 import Footer from './ChildComponents/Footer';
 
 class App extends Component {
-	constructor(props) {
-		super(props);
-		this.Auth = new AuthService();
-	}
+	// constructor(props) {
+	// 	super(props);
+	// 	this.Auth = new AuthService();
+	// }
 
 	componentWillMount() {
-		//get user and promoter data in an object from Auth
-		this.Auth.getData().then(res => {
-			this.props.dispatch(refreshData(res)); //add that to redux state
-		});
+		// // get user and promoter data in an object from Auth
+		// this.Auth.getData().then(res => {
+		// 	this.props.dispatch(refreshData(res)); //add that to redux state
+		// });
 	}
 
 	render() {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
+import { clearUserData } from '../../actions';
 
 import Promoter from '../ChildComponents/Account/Promoter';
 import PromoterRegistration from '../ChildComponents/Account/PromoterRegistration';
@@ -67,6 +68,7 @@ class Account extends Component {
 	handleLogout() {
 		this.Auth.logout();
 		this.props.history.replace('/login');
+		this.props.dispatch(clearUserData());
 	}
 }
 

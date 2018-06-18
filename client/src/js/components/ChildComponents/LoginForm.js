@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
-
+import { connect } from 'react-redux';
+import { refreshData } from '../../actions';
 class LoginForm extends Component {
 	constructor() {
 		super();
@@ -62,6 +63,12 @@ class LoginForm extends Component {
 		this.Auth.login(this.state.username, this.state.password)
 			.then(res => {
 				if (this.Auth.loggedIn()) {
+					// get user and promoter data in an object from Auth
+					this.Auth.getData().then(res => {
+						this.props.dispatch(refreshData(res)); //add that to redux state
+						console.log(res);
+					});
+
 					this.props.history.replace('/');
 				} else {
 					this.setState({ errorMessage: res });
@@ -73,4 +80,10 @@ class LoginForm extends Component {
 	}
 }
 
-export default LoginForm;
+function mapStateToProps(state) {
+	return {
+		username: state.username
+	};
+}
+
+export default connect(mapStateToProps)(LoginForm);
