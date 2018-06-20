@@ -124,26 +124,27 @@ class OneUser(Resource):
             return {'message': 'You are not authorized to access this information.'}
     @jwt_required
     def put(self, user):
-        data = request.get_json()
-
-        #get user trying to update
+        #get the name of the user that we're trying to update
         username = user
-        the_user = UserModel.find_by_username(username)
-
-        edited_user = user_schema_without_pass.load(data)
-        if not UserModel.find_by_username(user):
-            return {'message': 'User {} does not exist'. format(user)}
-
-        current_user = get_jwt_identity()
-        if not current_user == username:
+        #get the name of the user trying to do the updating
+        current_user_name = get_jwt_identity()
+        #return a helpful message if the user is trying to edit an account which is not their own
+        if not current_user_name == username:
             return {'message': 'You are not authorized to perform that action'}
 
-        new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==user).values(
+        #get JSON from request body
+        data = request.get_json()
+
+        #load a user object from the data in the request body
+        edited_user = user_schema_without_pass.load(data)
+
+        #replace found user's fields with those from the edited_user
+        new_user = update(UserModel.__table__).where(UserModel.__table__.c.username==username).values(
             firstName = edited_user.data['firstName'],
             lastName = edited_user.data['lastName'],
             email = edited_user.data['email'],
             phoneNumber = edited_user.data['phoneNumber'],
-            proPic = edited_user.data['proPic'],
+            proPicUrl = edited_user.data['proPicUrl'],
             organization = edited_user.data['organization']
         )
 
@@ -158,13 +159,10 @@ class OneUser(Resource):
 
 
 
-#this is a development route, to be deleted later
-class AllUsers(Resource):
-    def get(self):
-        return UserModel.return_all()
-
-    def delete(self):
-        return UserModel.delete_all()
+#this is a development route. Only leaving it here right now as an example of deletion
+# class AllUsers(Resource):
+#     def delete(self):
+#         return UserModel.delete_all()
 
 
 '''
@@ -178,18 +176,24 @@ class OnePromoter(Resource):
         #get identity & find the identity's info
         current_user = get_jwt_identity()
         result = UserModel.find_by_username(user)
-        #pull our associated promoter's name from our info. Note that this will throw an error if the user has no associated promoter
-        promoter_name = result.promoter_name
-        promoter = PromoterModel.find_by_name(promoter_name)
 
+        #pull our associated promoter's name from our info. Note that this will throw an error if the user has no associated promoter
+        try:
+            promoter_name = result.promoter_name
+            promoter = PromoterModel.find_by_name(promoter_name)
+        except:
+            return {'message': 'You are not associated with a promoter.'}
         #if we're the right user, serialize the found promoter and return the results
         if(user == current_user):
-            return promoter_schema.dump(promoter)
+            try:
+                return promoter_schema.dump(promoter)
+            except:
+                return {'message': 'Something went wrong.'}, 500
         else:
             return {'message': 'You are not authorized to access this information.'}
 
 #add a user to a Promoter
-class AddUser(Resource):
+class AddUserToPromoter(Resource):
     @jwt_required
     def post(self):
         data = request.get_json()
@@ -278,7 +282,7 @@ class UserRegistration(Resource):
             lastName = user.data['lastName'],
             email = user.data['email'],
             phoneNumber = user.data['phoneNumber'],
-            proPic = user.data['proPic'],
+            proPicUrl = user.data['proPicUrl'],
             organization = user.data['organization']
         )
 

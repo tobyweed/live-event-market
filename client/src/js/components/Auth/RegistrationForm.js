@@ -113,7 +113,6 @@ class RegistrationForm extends Component {
 					// get user and promoter data in an object from Auth
 					this.Auth.getData().then(res => {
 						this.props.dispatch(refreshData(res)); //add that to redux state
-						console.log(res);
 						this.props.history.replace('/');
 					});
 				} else {
