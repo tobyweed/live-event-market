@@ -15,7 +15,7 @@ class UserSchema(Schema):
     lastName = fields.Str(missing=None)
     email = fields.Str(missing=None)
     phoneNumber = fields.Str(missing=None)
-    proPic = fields.Str(missing=None)
+    proPicUrl = fields.Str(missing=None)
     organization = fields.Str(missing=None)
     promoter_name = fields.Str()
 
@@ -26,7 +26,7 @@ class UserSchemaWithoutPass(Schema):
     lastName = fields.Str(missing=None)
     email = fields.Str(missing=None)
     phoneNumber = fields.Str(missing=None)
-    proPic = fields.Str(missing=None)
+    proPicUrl = fields.Str(missing=None)
     organization = fields.Str(missing=None)
     promoter_name = fields.Str()
 
@@ -132,7 +132,7 @@ class UserModel(db.Model):
     lastName = db.Column(db.String(120))
     email = db.Column(db.String(120))
     phoneNumber = db.Column(db.String(120))
-    proPic = db.Column(db.String(120))
+    proPicUrl = db.Column(db.String(120))
     organization = db.Column(db.String(120))
     promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
 
