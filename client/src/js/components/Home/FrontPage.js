@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import '../../../css/FrontPage.css';
 import videoimg from '../../../images/video.png';
 
+import SearchForm from '../Search/SearchForm';
+
 class FrontPage extends Component {
 	render() {
 		return (
@@ -22,52 +24,7 @@ class FrontPage extends Component {
 						</p>
 					</div>
 				</div>
-				<div className="form">
-					<div className="form_content">
-						<form
-							className="form_grid"
-							method="POST"
-							action="/send"
-							onSubmit={this.handleFormSubmit}
-						>
-							<input
-								className="button_plain form_search"
-								type="text"
-								name="artist"
-								placeholder="Search Event, Promoter, or Sponsor"
-								onChange={this.handleChange}
-							/>
-							<input
-								className="button_color form_submit"
-								type="submit"
-								value="Search"
-								onChange={this.handleChange}
-							/>
-							<div className="form_artist">
-								<input
-									type="radio"
-									name="search_type"
-									value="search_artist"
-									onChange={this.handleChange}
-								/>{' '}
-								&nbsp; Artist
-							</div>
-							<div className="form_event">
-								<input type="radio" name="search_type" value="search_event" />{' '}
-								&nbsp; Event
-							</div>
-							<div className="form_promoter">
-								<input
-									type="radio"
-									name="search_type"
-									value="search_promoter"
-									onChange={this.handleChange}
-								/>{' '}
-								&nbsp; Promoter
-							</div>
-						</form>
-					</div>
-				</div>
+				<SearchForm />
 			</div>
 		);
 	}

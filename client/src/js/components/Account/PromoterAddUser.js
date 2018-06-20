@@ -54,7 +54,7 @@ class PromoterAddUser extends Component {
 			})
 			.then(res => {
 				if (
-					res.data.message ==
+					res.data.message ===
 					'User ' + newUserUsername + ' was added to your promoter account.'
 				) {
 					this.props.dispatch(addUser(newUserUsername));

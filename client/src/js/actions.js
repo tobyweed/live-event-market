@@ -1,8 +1,3 @@
-import axios from 'axios';
-import AuthService from './utils/auth/AuthService';
-
-const Auth = new AuthService();
-
 const SET_USER_DATA = 'SET_USER_DATA';
 const SET_PROMOTER_DATA = 'SET_PROMOTER_DATA';
 const UPDATE_USER = 'UPDATE_USER';

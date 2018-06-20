@@ -25,6 +25,7 @@ class SearchEvents(Resource):
         args = request.args
         print(args)
         name = args['name']
+        print(name)
         start_date = args['start_date']
         end_date = args['end_date']
         # if not name: #name is required

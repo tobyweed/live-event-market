@@ -104,7 +104,7 @@ class EventInfo(db.Model):
     def search(cls,name,start_date,end_date):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
-        if name and (name.len() >= 3):
+        if name and (len(name) >= 3):
             search = EventInfo.query.whooshee_search(name)
         else:
             search = EventInfo.query

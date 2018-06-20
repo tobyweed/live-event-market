@@ -3,6 +3,7 @@ import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
 import { connect } from 'react-redux';
 import { refreshData } from '../../actions';
+
 class LoginForm extends Component {
 	constructor() {
 		super();
