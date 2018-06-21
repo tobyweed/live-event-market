@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
 import { refreshData } from '../../actions';
+import { withRouter } from 'react-router';
 
 class RegistrationForm extends Component {
 	constructor() {
@@ -15,13 +16,6 @@ class RegistrationForm extends Component {
 	state = {
 		errorMessage: ''
 	};
-
-	componentWillMount() {
-		//Redirect if we are already logged in
-		if (this.Auth.loggedIn()) {
-			this.props.history.replace('/');
-		}
-	}
 
 	render() {
 		return (
@@ -113,7 +107,6 @@ class RegistrationForm extends Component {
 					// get user and promoter data in an object from Auth
 					this.Auth.getData().then(res => {
 						this.props.dispatch(refreshData(res)); //add that to redux state
-						this.props.history.replace('/');
 					});
 				} else {
 					this.setState({ errorMessage: res });
@@ -132,4 +125,4 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps)(RegistrationForm);
+export default connect(mapStateToProps)(withRouter(RegistrationForm));

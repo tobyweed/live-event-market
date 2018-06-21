@@ -62,7 +62,6 @@ class Account extends Component {
 
 	handleLogout() {
 		this.Auth.logout();
-		this.props.history.replace('/login');
 		this.props.dispatch(clearUserData());
 	}
 }

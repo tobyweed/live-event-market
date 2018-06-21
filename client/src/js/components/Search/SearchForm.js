@@ -4,27 +4,46 @@ import '../../../css/App.css';
 import { connect } from 'react-redux';
 import { refreshData } from '../../actions';
 import { withRouter } from 'react-router';
+import qs from 'query-string';
 
 class SearchForm extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			errorMessage: '',
+			searchName: ''
+		};
+
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 	}
 
-	state = {
-		errorMessage: ''
-	};
+	// state = {
+	// 	errorMessage: '',
+	// 	initialContent: ''
+	// };
+	//
+
+	componentDidMount() {
+		let query = qs.parse(this.props.location.search);
+		let initialSearchName = query.name;
+		if (initialSearchName) {
+			this.setState({ searchName: initialSearchName });
+		}
+	}
 
 	render() {
 		return (
 			<div className="form">
 				<div className="form_content">
 					<form onSubmit={this.handleFormSubmit}>
+						{/* value={this.state.initialContent} */}
 						<input
 							className="button_plain form_search"
-							placeholder="Search Event, Promoter, or Sponsor"
-							name="name"
+							placeholder="Search Events"
+							value={this.state.searchName}
+							name="searchName"
 							type="text"
 							onChange={this.handleChange}
 							required
@@ -41,7 +60,6 @@ class SearchForm extends Component {
 							className="button_color form_submit"
 							type="submit"
 							value="Search"
-							onChange={this.handleChange}
 						/>
 					</form>
 					<p>{this.state.errorMessage}</p>
@@ -50,6 +68,7 @@ class SearchForm extends Component {
 		);
 	}
 
+	//bind state to inputs
 	handleChange(e) {
 		this.setState({
 			[e.target.name]: e.target.value
@@ -61,7 +80,11 @@ class SearchForm extends Component {
 		e.preventDefault();
 
 		//convert undefined attributes into empty strings for the search
-		var args = [this.state.name, this.state.start_date, this.state.end_date];
+		var args = [
+			this.state.searchName,
+			this.state.start_date,
+			this.state.end_date
+		];
 		args.forEach((arg, i) => {
 			args[i] = arg === undefined ? '' : arg;
 		});

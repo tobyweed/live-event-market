@@ -3,19 +3,35 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import qs from 'query-string';
 import { search } from '../../utils/functions';
+import SearchForm from './SearchForm';
 
 class Account extends Component {
 	state = {
+		search: '',
 		results: '',
 		errorMessage: ''
 	};
 
+	componentWillMount() {
+		this.unlisten = this.props.history.listen(location => {
+			console.log('current location:' + location);
+			let query = qs.parse(location.search);
+			this.searchEvents(query.name, query.start_date, query.end_date);
+		});
+	}
+
+	componentWillUnmount() {
+		this.unlisten();
+	}
+
 	componentDidMount() {
-		const query = qs.parse(this.props.location.search);
-		console.log(query);
-		search(query.name, query.start_date, query.end_date)
+		let query = qs.parse(this.props.location.search);
+		this.searchEvents(query.name, query.start_date, query.end_date);
+	}
+
+	searchEvents(name, start_date, end_date) {
+		search(name, start_date, end_date)
 			.then(res => {
-				console.log(res);
 				this.setState({ results: res }); //add that to redux state
 			})
 			.catch(err => {
@@ -26,26 +42,37 @@ class Account extends Component {
 
 	render() {
 		const results = this.state.results;
-		console.log(results);
 		return (
 			<div className="search-results-page">
-				{results ? (
-					<ul>
-						<li>wooohoo</li>
-					</ul>
+				<SearchForm />
+				{results.data && results.data.constructor === Array ? (
+					<div>
+						<h1>Search Results:</h1>
+						<ul>
+							{results.data.map(function(event_info, i) {
+								return (
+									<li key={i}>
+										<h4>{event_info.name}</h4>
+										Dates & Locations:
+										<ul>
+											{event_info.events.map(function(event, i) {
+												return <li key={i}>Start Date: {event.start_date}</li>;
+											})}
+										</ul>
+									</li>
+								);
+							})}
+						</ul>
+					</div>
 				) : (
-					<p>arojadsflj</p>
+					<h1>
+						There are no events matching that description. Please try something
+						else.
+					</h1>
 				)}
 			</div>
 		);
 	}
 }
 
-function mapStateToProps(state) {
-	return {
-		userData: state.idData.userData,
-		promoterData: state.idData.promoterData
-	};
-}
-
-export default connect(mapStateToProps)(withRouter(Account));
+export default withRouter(Account);

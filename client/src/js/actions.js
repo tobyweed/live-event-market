@@ -4,7 +4,14 @@ const UPDATE_USER = 'UPDATE_USER';
 const CLEAR_USER_DATA = 'CLEAR_USER_DATA';
 const REFRESH_DATA = 'REFRESH_DATA';
 const ADD_USER = 'ADD_USER';
+const SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS';
 
+//searchResults
+export function setSearchResults(results) {
+	return { type: SET_SEARCH_RESULTS, results: results };
+}
+
+//idData
 export function setUserData(userData) {
 	return { type: SET_USER_DATA, userData: userData };
 }
