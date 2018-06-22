@@ -20,7 +20,7 @@ class EventRegistration extends Component {
 	render() {
 		return (
 			<div className="event-registration">
-				<h3>Create an Event</h3>
+				<h3>Create a New Event</h3>
 				<form onSubmit={this.handleFormSubmit}>
 					<input
 						className="form-item"

@@ -1,9 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
-from flask_whooshee import Whooshee
 
-whooshee = Whooshee()
 db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
 
 
@@ -76,7 +74,6 @@ class Event(db.Model):
     def find_by_id(cls, id):
        return cls.query.filter_by(id = id).first()
 
-@whooshee.register_model('name')
 class EventInfo(db.Model):
     __tablename__ = 'event_info'
     __table_args__ = {'extend_existing': True}
@@ -106,10 +103,9 @@ class EventInfo(db.Model):
     def search(cls,name,start_date,end_date):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
+        search = EventInfo.query
         if name:
-            search = EventInfo.query.whooshee_search(name)
-        else:
-            search = EventInfo.query.with_entities(EventInfo.id)
+            search = search.filter(EventInfo.name.contains(name))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
             search = search.filter(Event.start_date <= start_date)
@@ -118,7 +114,7 @@ class EventInfo(db.Model):
         #locations: proximity, if possible
         #types: Compares the query list to the event list. Exact
         #series, ticketed, private: boolean values, exact
-        return search.with_entities(EventInfo.id).all() #return only ids, not whole objects
+        return search.with_entities(EventInfo.id).distinct().all() #return only ids, not whole objects. Distinct avoids duplicates
 
 
 

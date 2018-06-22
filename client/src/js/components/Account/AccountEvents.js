@@ -13,7 +13,7 @@ class AccountEvents extends Component {
 				<h1>Events</h1>
 				<h3>Events Created by This Promoter Account:</h3>
 				<div>
-					{eventInfos ? (
+					{eventInfos[0] ? (
 						<ul>
 							{eventInfos.map(function(eventInfo, i) {
 								return (
@@ -27,7 +27,6 @@ class AccountEvents extends Component {
 						<span>This promoter account has not created any events.</span>
 					)}
 				</div>
-				<h3>Create a New Event</h3>
 				<EventRegistration />
 			</div>
 		);

@@ -24,11 +24,14 @@ class AccountEvents extends Component {
 			<div>
 				<h4>{eventInfo.name}</h4>
 				Dates & Locations:
-				<ul>
-					{eventInfo.events.map(function(event, i) {
-						return <li key={i}>Start Date: {event.start_date}</li>;
-					})}
-				</ul>
+				{eventInfo.events.map(function(event, i) {
+					return (
+						<ul>
+							<li key={i}>Start Date: {event.start_date}</li>
+							<li key={i}>End Date: {event.end_date}</li>
+						</ul>
+					);
+				})}
 			</div>
 		) : (
 			<span>The page is loading</span>

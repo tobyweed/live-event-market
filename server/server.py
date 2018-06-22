@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify
 from flask_restful import Api
-from models import db, whooshee
+from models import db
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -12,10 +12,8 @@ api = Api(app) #make an Flask_RESTful api for the app
 #configure db
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['WHOOSHEE_MIN_STRING_LEN'] = 1 #set whooshee minimum search string length to 1 (default 3)
 
 db.init_app(app) #necessary to do it this way to avoid circular imports
-whooshee.init_app(app)
 
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
