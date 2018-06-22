@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import qs from 'query-string';
 import { search } from '../../utils/functions';
 import SearchForm from './SearchForm';
+import EventListing from '../Events/EventListing';
 
 class Account extends Component {
 	state = {
@@ -13,18 +13,19 @@ class Account extends Component {
 	};
 
 	componentWillMount() {
+		//Listen for url changes and re-search based on the new query string
 		this.unlisten = this.props.history.listen(location => {
-			console.log('current location:' + location);
 			let query = qs.parse(location.search);
 			this.searchEvents(query.name, query.start_date, query.end_date);
 		});
 	}
 
 	componentWillUnmount() {
-		this.unlisten();
+		this.unlisten(); //stop listening
 	}
 
 	componentDidMount() {
+		//Intialize results based on query string
 		let query = qs.parse(this.props.location.search);
 		this.searchEvents(query.name, query.start_date, query.end_date);
 	}
@@ -42,6 +43,7 @@ class Account extends Component {
 
 	render() {
 		const results = this.state.results;
+
 		return (
 			<div className="search-results-page">
 				<SearchForm />
@@ -49,16 +51,10 @@ class Account extends Component {
 					<div>
 						<h1>Search Results:</h1>
 						<ul>
-							{results.data.map(function(event_info, i) {
+							{results.data.map(function(eventInfo, i) {
 								return (
 									<li key={i}>
-										<h4>{event_info.name}</h4>
-										Dates & Locations:
-										<ul>
-											{event_info.events.map(function(event, i) {
-												return <li key={i}>Start Date: {event.start_date}</li>;
-											})}
-										</ul>
+										<EventListing eventId={eventInfo[0]} />
 									</li>
 								);
 							})}

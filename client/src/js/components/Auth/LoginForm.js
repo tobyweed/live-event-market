@@ -17,13 +17,6 @@ class LoginForm extends Component {
 		errorMessage: ''
 	};
 
-	componentWillMount() {
-		//Redirect if we are already logged in
-		// if (this.Auth.loggedIn()) {
-		// 	this.props.history.replace('/');
-		// }
-	}
-
 	render() {
 		return (
 			<div>

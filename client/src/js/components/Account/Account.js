@@ -4,7 +4,6 @@ import { clearUserData } from '../../actions';
 
 import Promoter from '../Account/Promoter';
 import PromoterRegistration from '../Account/PromoterRegistration';
-import PromoterAddUser from '../Account/PromoterAddUser';
 import EditAccount from '../Account/EditAccount';
 
 import AuthService from '../../utils/auth/AuthService';
@@ -35,7 +34,6 @@ class Account extends Component {
 						{promoterData.name ? (
 							<div>
 								<Promoter />
-								<PromoterAddUser />
 							</div>
 						) : (
 							<div>

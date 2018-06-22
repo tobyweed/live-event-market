@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import AuthService from '../../utils/auth/AuthService';
 import '../../../css/App.css';
-import { connect } from 'react-redux';
-import { refreshData } from '../../actions';
 import { withRouter } from 'react-router';
 import qs from 'query-string';
 

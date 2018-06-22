@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import AccountEvents from './AccountEvents';
+import PromoterAddUser from '../Account/PromoterAddUser';
+
 class Promoter extends Component {
 	render() {
 		const users = this.props.promoterData.users;
@@ -26,7 +29,8 @@ class Promoter extends Component {
 						<li>Phone #: {this.state.userData.phoneNumber}</li>
 						<li>Organization: {this.state.userData.organization}</li>*/}
 				</ul>
-				{/* Insert component with promoter and user props.  */}
+				<PromoterAddUser />
+				<AccountEvents />
 			</div>
 		);
 	}

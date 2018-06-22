@@ -23,23 +23,39 @@ event_schema = EventSchema()
 class SearchEvents(Resource):
     def get(self):
         args = request.args
-        print(args)
         name = args['name']
-        print(name)
         start_date = args['start_date']
         end_date = args['end_date']
         # if not name: #name is required
         #     return {'message':'Please enter a search term.'}
 
-        #get list of events matching the search Query
-        events = EventInfo.search(name, start_date, end_date)
-        if not events:
+        #get list of event_info ids of event_infos matching the search query
+        event_ids = EventInfo.search(name, start_date, end_date)
+        if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
-        event_dumps = []
-        for i in range(len(events)):
-            dumped_event = event_info_schema.dump(events[i])
-            event_dumps.append(dumped_event.data)
-        return event_dumps
+
+        try:
+            return event_ids
+        except:
+            return {'message':'Something went wrong.'},500
+
+
+#return all events with a particular promoter_name (COMMENTED OUT BC MAY NOT BE NECESSARY)
+# class GetEventIdsByPromoter(Resource):
+#     def get(self, promoter_name):
+#         if not promoter_name: #make sure there is a search term
+#             return {'message':'Please enter a promoter name to get the events associated with it.'}
+#         promoter = PromoterModel.find_by_name(promoter_name)
+#         if not promoter: #check if the queried promoter exists
+#             return {'message':'That promoter does not exist.'}
+#         events = EventInfo.find_ids_by_promoter(promoter_name)
+#         if not events: #check if the promoter has any associated events
+#             return {'message':'That promoter has not created any events.'}
+#         try:
+#             return events #return a list of ids
+#         except:
+#             return {'message':'Something went wrong.'},500
+
 
 
 #return all the data of one event_info and all of its events. Query based on id #.
@@ -96,15 +112,19 @@ class CreateEvent(Resource):
         promoter = PromoterModel.find_by_name(current_user_promoter)
         promoter.event_infos.append(new_event_info)
 
-        try:
-            new_event.save_to_db()
-            new_event_info.save_to_db()
-            promoter.save_to_db()
-            return {
-                'message': 'Event {} was created'.format(data['name'])
-            }
-        except:
-            return {'message': 'Something went wrong'}, 500
+        # try:
+        new_event.save_to_db()
+        new_event_info.save_to_db()
+        promoter.save_to_db()
+        #return json serialized promoter's list of event_ids, which now includes the new event
+        ret = promoter_schema.dump(promoter)
+        print(ret.data['event_infos'])
+        return ret.data['event_infos']
+            # return {
+            #     'message': 'Event {} was created'.format(data['name'])
+            # }
+        # except:
+        #     return {'message': 'Something went wrong'}, 500
 
 
 

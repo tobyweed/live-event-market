@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import '../../../css/GlobalNav.css';
 import master_logo from '../../../images/master_logo.png';
 import blank_prof from '../../../images/blank_prof.png';
+import { withRouter } from 'react-router';
 
 import AuthService from '../../utils/auth/AuthService';
 
@@ -12,9 +13,30 @@ class Nav extends Component {
 		this.Auth = new AuthService();
 	}
 
+	state = {
+		initialized: false
+	};
+
+	componentWillMount() {
+		//Whenever the url changes, re-initalize the app and tell state it's okay to render the navbar
+		this.unlisten = this.props.history.listen(location => {
+			this.Auth.initialize().then(res => {
+				this.setState({ initialized: true });
+			});
+		});
+	}
+
+	componentWillUnmount() {
+		this.unlisten();
+	}
+
+	componentDidMount() {
+		this.setState({ initialized: true });
+	}
+
 	render() {
 		const loggedIn = this.Auth.loggedIn();
-		return (
+		return this.state.initialized ? (
 			<div>
 				<ul className="navbar fixed">
 					<li className="navbar left">
@@ -84,8 +106,8 @@ class Nav extends Component {
 				</ul>
 				<div className="nav_spacer" />
 			</div>
-		);
+		) : null;
 	}
 }
 
-export default Nav;
+export default withRouter(Nav);

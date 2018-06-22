@@ -1,15 +1,10 @@
 const SET_USER_DATA = 'SET_USER_DATA';
-const SET_PROMOTER_DATA = 'SET_PROMOTER_DATA';
 const UPDATE_USER = 'UPDATE_USER';
+const SET_PROMOTER_DATA = 'SET_PROMOTER_DATA';
+const UPDATE_PROMOTER = 'UPDATE_PROMOTER';
+const ADD_USER = 'ADD_USER';
 const CLEAR_USER_DATA = 'CLEAR_USER_DATA';
 const REFRESH_DATA = 'REFRESH_DATA';
-const ADD_USER = 'ADD_USER';
-const SET_SEARCH_RESULTS = 'SET_SEARCH_RESULTS';
-
-//searchResults
-export function setSearchResults(results) {
-	return { type: SET_SEARCH_RESULTS, results: results };
-}
 
 //idData
 export function setUserData(userData) {
@@ -22,6 +17,10 @@ export function updateUser(key, value) {
 
 export function setPromoterData(promoterData) {
 	return { type: SET_PROMOTER_DATA, promoterData: promoterData };
+}
+
+export function updatePromoter(key, value) {
+	return { type: UPDATE_PROMOTER, key: key, value: value };
 }
 
 export function addUser(user) {

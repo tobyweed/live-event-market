@@ -30,19 +30,21 @@ class UserSchemaWithoutPass(Schema):
     organization = fields.Str(missing=None)
     promoter_name = fields.Str()
 
-class PromoterSchema(Schema):
-    name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
-    users = fields.Nested(UserSchema, only=['username'], many=True)
-
 class EventSchema(Schema):
     start_date = fields.DateTime()
     end_date = fields.DateTime()
     event_name = fields.Str()
 
 class EventInfoSchema(Schema):
+    id = fields.Integer()
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
     events = fields.Nested(EventSchema, many=True)
     promoter_name = fields.Str()
+
+class PromoterSchema(Schema):
+    name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    users = fields.Nested(UserSchema, only=['username'], many=True)
+    event_infos = fields.Nested(EventInfoSchema, only=['id'], many=True)
 
 
 
@@ -107,7 +109,7 @@ class EventInfo(db.Model):
         if name:
             search = EventInfo.query.whooshee_search(name)
         else:
-            search = EventInfo.query
+            search = EventInfo.query.with_entities(EventInfo.id)
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
             search = search.filter(Event.start_date <= start_date)
@@ -116,7 +118,7 @@ class EventInfo(db.Model):
         #locations: proximity, if possible
         #types: Compares the query list to the event list. Exact
         #series, ticketed, private: boolean values, exact
-        return search.all()
+        return search.with_entities(EventInfo.id).all() #return only ids, not whole objects
 
 
 

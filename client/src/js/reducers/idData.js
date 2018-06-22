@@ -23,6 +23,15 @@ const idData = (state = initialState, action) => {
 				...state,
 				promoterData: action.promoterData
 			};
+		case 'UPDATE_PROMOTER':
+			console.log(action);
+			return {
+				...state,
+				promoterData: {
+					...state.promoterData,
+					[action.key]: action.value
+				}
+			};
 		case 'ADD_USER':
 			return {
 				...state,
