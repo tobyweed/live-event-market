@@ -1,4 +1,5 @@
 import os
+import datetime
 from flask import Flask, jsonify
 from flask_restful import Api
 from models import db
@@ -18,6 +19,7 @@ db.init_app(app) #necessary to do it this way to avoid circular imports
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(0,10800)
 jwt = JWTManager(app)
 
 #create all db tables

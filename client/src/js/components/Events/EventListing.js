@@ -26,9 +26,9 @@ class AccountEvents extends Component {
 				Dates & Locations:
 				{eventInfo.events.map(function(event, i) {
 					return (
-						<ul>
-							<li key={i}>Start Date: {event.start_date}</li>
-							<li key={i}>End Date: {event.end_date}</li>
+						<ul key={i}>
+							<li>Start Date: {event.start_date}</li>
+							<li>End Date: {event.end_date}</li>
 						</ul>
 					);
 				})}
