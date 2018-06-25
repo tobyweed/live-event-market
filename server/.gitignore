@@ -1,0 +1,11 @@
+# environment
+venv
+serverenv
+.env
+sqlite:
+test.sqlite
+
+#misc
+__pycache__
+.DS_Store
+*.pyc

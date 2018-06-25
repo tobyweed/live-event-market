@@ -14,7 +14,15 @@ api = Api(app) #make an Flask_RESTful api for the app
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app) #necessary to do it this way to avoid circular imports
+class MySQLAlchemy(SQLAlchemy):
+    def apply_driver_hacks(self, app, info, options):
+        options.update({
+            'connect_args': {sslca: 'amazon-rds-ca-cert.pem'}
+        })
+        super(MySQLAlchemy, self).apply_driver_hacks(app, info, options)
+
+db = MySQLAlchemy(app)
+# db.init_app(app) #necessary to do it this way to avoid circular imports
 
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -34,12 +42,13 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return models.RevokedTokenModel.is_jti_blacklisted(jti)
 
-#root
+#root.. not sure I need this
 @app.route('/')
 def index():
+    print("WOohoooo!!!")
     return jsonify({'message': 'Hello, World!'})
 
-#configure Flask_RESTful api
+# configure Flask_RESTful api
 import models, endpoints
 api.add_resource(endpoints.UserRegistration, '/registration')
 api.add_resource(endpoints.UserLogin, '/login')

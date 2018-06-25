@@ -2,7 +2,14 @@ from flask_sqlalchemy import SQLAlchemy
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
 
-db = SQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
+class MySQLAlchemy(SQLAlchemy):
+    def apply_driver_hacks(self, app, info, options):
+        options.update({
+            'connect_args': {sslca: amazon-rds-ca-cert.pem}
+        })
+        super(MySQLAlchemy, self).apply_driver_hacks(app, info, options)
+
+db = MySQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
 
 
 #declare schemas

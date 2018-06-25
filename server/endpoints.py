@@ -6,7 +6,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 import json
 
 from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, UserSchemaWithoutPass, PromoterSchema, EventSchema, EventInfoSchema)
-from server import db
+from models import db
 
 #initialize schemas
 user_schema = UserSchema()
