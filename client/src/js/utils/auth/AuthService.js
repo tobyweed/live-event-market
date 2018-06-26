@@ -122,7 +122,7 @@ class AuthService {
 	initialize() {
 		const refresh = this.getRefresh();
 
-		//if there is an api url defined, in our environment set it as the base for all axios requests
+		//if there is an api url defined in our environment set it as the base for all axios requests
 		if (!!process.env.REACT_APP_API_URL) {
 			axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 		}

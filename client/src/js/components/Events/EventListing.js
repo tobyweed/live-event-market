@@ -34,7 +34,10 @@ class AccountEvents extends Component {
 				})}
 			</div>
 		) : (
-			<span>The page is loading</span>
+			<span>
+				This event listing is still loading. Try refreshing the page if load
+				does not occur.
+			</span>
 		);
 	}
 }

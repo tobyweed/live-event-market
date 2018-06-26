@@ -58,7 +58,6 @@ class SearchEvents(Resource):
 
 #return all the data of one event_info and all of its events. Query based on id #.
 class OneEvent(Resource):
-    @jwt_required
     def get(self, id):
         #get the right event_info
         event_info = EventInfo.find_by_id(id)

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
-import qs from 'query-string';
+import qs from 'qs';
 import { search } from '../../utils/functions';
 import SearchForm from './SearchForm';
 import EventListing from '../Events/EventListing';
@@ -15,7 +15,7 @@ class Account extends Component {
 	componentWillMount() {
 		//Listen for url changes and re-search based on the new query string
 		this.unlisten = this.props.history.listen(location => {
-			let query = qs.parse(location.search);
+			let query = qs.parse(location.search.slice(1));
 			this.searchEvents(query.name, query.start_date, query.end_date);
 		});
 	}
@@ -26,7 +26,7 @@ class Account extends Component {
 
 	componentDidMount() {
 		//Intialize results based on query string
-		let query = qs.parse(this.props.location.search);
+		let query = qs.parse(this.props.location.search.slice(1));
 		this.searchEvents(query.name, query.start_date, query.end_date);
 	}
 

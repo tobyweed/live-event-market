@@ -2,9 +2,11 @@ import os
 import datetime
 from flask import Flask, jsonify
 from flask_restful import Api
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__) #initialize Flask app
+CORS(app)
 app.config.from_object(os.environ['APP_SETTINGS']) #config must be defined in an envvar, ex.: "config.DevelopmentConfig"
 api = Api(app) #make an Flask_RESTful api for the app
 

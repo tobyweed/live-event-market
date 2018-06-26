@@ -104,7 +104,7 @@ class EventInfo(Base):
         #names: returns a list of events with similar names
         search = EventInfo.query
         if name:
-            search = search.filter(EventInfo.name.contains(name))
+            search = search.filter(EventInfo.name.ilike('%'+name+'%'))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
             search = search.filter(Event.start_date <= start_date)

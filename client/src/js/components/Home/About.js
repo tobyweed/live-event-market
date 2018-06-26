@@ -13,7 +13,7 @@ class About extends Component {
 						<b>Connecting Partners</b>
 						<br />
 						Our platform allows the live events industry to discover and contact
-						well fit partners for better live experiances.<br />
+						well fit partners for better live experiences.<br />
 						<br />
 						<b>Creating Content</b>
 						<br />

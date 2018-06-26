@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../../../css/App.css';
 import { withRouter } from 'react-router';
-import qs from 'query-string';
+import qs from 'qs';
 
 class SearchForm extends Component {
 	constructor(props) {
@@ -23,7 +23,7 @@ class SearchForm extends Component {
 	//
 
 	componentDidMount() {
-		let query = qs.parse(this.props.location.search);
+		let query = qs.parse(this.props.location.search.slice(1));
 		let initialSearchName = query.name;
 		if (initialSearchName) {
 			this.setState({ searchName: initialSearchName });

@@ -1,12 +1,15 @@
 {
 	"name": "client",
 	"version": "0.1.0",
-	"private": true,
+	"engines": {
+		"node": "8.11.1",
+		"npm": "5.6.0"
+	},
 	"proxy": "http://127.0.0.1:5000/",
 	"dependencies": {
 		"axios": "^0.18.0",
 		"jwt-decode": "^2.2.0",
-		"query-string": "^6.1.0",
+		"qs": "^6.5.2",
 		"react": "^16.3.2",
 		"react-dom": "^16.3.2",
 		"react-redux": "^5.0.7",
@@ -17,7 +20,8 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build",
+		"build":
+			"REACT_APP_API_URL=https://live-event-market-api.herokuapp.com react-scripts build",
 		"test": "react-scripts test --env=jsdom",
 		"eject": "react-scripts eject"
 	}

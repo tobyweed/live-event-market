@@ -41,12 +41,12 @@ class Footer extends Component {
 								className="button_plain form_search"
 								type="text"
 								name="email"
-								placeholder="Your Email..."
+								placeholder="Currently a Dead Link"
 							/>
 							<input
 								className="button_color form_submit"
 								type="submit"
-								value="Subscribe"
+								value="Doesn't Do Anything"
 							/>
 						</form>
 					</div>
