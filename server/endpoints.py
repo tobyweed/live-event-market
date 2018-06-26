@@ -1,13 +1,11 @@
 from flask_restful import Resource, request
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import update
 from datetime import datetime
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 import json
 
 from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, UserSchemaWithoutPass, PromoterSchema, EventSchema, EventInfoSchema)
-from models import db
-
+from database import db_session
 #initialize schemas
 user_schema = UserSchema()
 user_schema_without_pass = UserSchemaWithoutPass()
@@ -171,8 +169,8 @@ class OneUser(Resource):
 
         try:
             ret = user_schema_without_pass.dump(data)
-            db.session.execute(new_user)
-            db.session.commit()
+            db_session.execute(new_user)
+            db_session.commit()
             return ret
         except:
             return {'message': 'Something went wrong'}, 500

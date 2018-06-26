@@ -2,27 +2,11 @@ import os
 import datetime
 from flask import Flask, jsonify
 from flask_restful import Api
-from models import db
 from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__) #initialize Flask app
 app.config.from_object(os.environ['APP_SETTINGS']) #config must be defined in an envvar, ex.: "config.DevelopmentConfig"
 api = Api(app) #make an Flask_RESTful api for the app
-
-#configure db
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URI']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-class MySQLAlchemy(SQLAlchemy):
-    def apply_driver_hacks(self, app, info, options):
-        options.update({
-            'connect_args': {sslca: 'amazon-rds-ca-cert.pem'}
-        })
-        super(MySQLAlchemy, self).apply_driver_hacks(app, info, options)
-
-db = MySQLAlchemy(app)
-# db.init_app(app) #necessary to do it this way to avoid circular imports
 
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -33,14 +17,20 @@ jwt = JWTManager(app)
 #create all db tables
 @app.before_first_request
 def create_tables():
-    from models import UserModel, RevokedTokenModel, PromoterModel, EventInfo, Event
-    db.create_all()
+    from database import init_db
+    init_db()
+
+from database import db_session
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 #support jwt blacklisting for logouts
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
-    return models.RevokedTokenModel.is_jti_blacklisted(jti)
+    from models import RevokedTokenModel
+    return RevokedTokenModel.is_jti_blacklisted(jti)
 
 #root.. not sure I need this
 @app.route('/')
@@ -49,7 +39,7 @@ def index():
     return jsonify({'message': 'Hello, World!'})
 
 # configure Flask_RESTful api
-import models, endpoints
+import endpoints
 api.add_resource(endpoints.UserRegistration, '/registration')
 api.add_resource(endpoints.UserLogin, '/login')
 api.add_resource(endpoints.UserLogoutAccess, '/logout/access')
@@ -65,4 +55,4 @@ api.add_resource(endpoints.SearchEvents, '/search-events')
 
 #run
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port = int(os.environ.get('PORT', 5000)))

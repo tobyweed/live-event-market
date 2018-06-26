@@ -1,16 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
+from database import Base, db_session
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
-
-class MySQLAlchemy(SQLAlchemy):
-    def apply_driver_hacks(self, app, info, options):
-        options.update({
-            'connect_args': {sslca: amazon-rds-ca-cert.pem}
-        })
-        super(MySQLAlchemy, self).apply_driver_hacks(app, info, options)
-
-db = MySQLAlchemy() #Necessary to declare this here instead of server to avoid circular imports
-
 
 #declare schemas
 class UserSchema(Schema):
@@ -62,41 +54,41 @@ The eventinfo to event relationship is one to many.
 There is another one to many join for event types, and another for images.
 '''
 
-class Event(db.Model):
+class Event(Base):
     __tablename__ = 'event'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key = True)
-    start_date = db.Column(db.DateTime)
-    end_date = db.Column(db.DateTime)
-    event_id = db.Column(db.Integer, db.ForeignKey('event_info.id'))
+    id = Column(Integer, primary_key = True)
+    start_date = Column(DateTime)
+    end_date = Column(DateTime)
+    event_id = Column(Integer, ForeignKey('event_info.id'))
 
-    event_info = db.relationship("EventInfo", back_populates="events")
+    event_info = relationship("EventInfo", back_populates="events")
 
     def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
     def find_by_id(cls, id):
        return cls.query.filter_by(id = id).first()
 
-class EventInfo(db.Model):
+class EventInfo(Base):
     __tablename__ = 'event_info'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(120), nullable = False)
-    promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
+    id = Column(Integer, primary_key = True)
+    name = Column(String(120), nullable = False)
+    promoter_name = Column(String(120), ForeignKey('promoters.name'))
 
-    events = db.relationship("Event", order_by=Event.id, back_populates="event_info")
-    promoter = db.relationship("PromoterModel", back_populates="event_infos")
+    events = relationship("Event", order_by=Event.id, back_populates="event_info")
+    promoter = relationship("PromoterModel", back_populates="event_infos")
     #event type
     #event images
 
     def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
     def find_by_name(cls, name):
@@ -126,26 +118,26 @@ class EventInfo(db.Model):
 
 
 #represents users
-class UserModel(db.Model):
+class UserModel(Base):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
 
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(120), unique = True, nullable = False)
-    password = db.Column(db.String(120), nullable = False)
-    firstName = db.Column(db.String(120))
-    lastName = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    phoneNumber = db.Column(db.String(120))
-    proPicUrl = db.Column(db.String(120))
-    organization = db.Column(db.String(120))
-    promoter_name = db.Column(db.String(120), db.ForeignKey('promoters.name'))
+    id = Column(Integer, primary_key = True)
+    username = Column(String(120), unique = True, nullable = False)
+    password = Column(String(120), nullable = False)
+    firstName = Column(String(120))
+    lastName = Column(String(120))
+    email = Column(String(120))
+    phoneNumber = Column(String(120))
+    proPicUrl = Column(String(120))
+    organization = Column(String(120))
+    promoter_name = Column(String(120), ForeignKey('promoters.name'))
 
-    promoter = db.relationship("PromoterModel", back_populates="users")
+    promoter = relationship("PromoterModel", back_populates="users")
 
     def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
     def find_by_username(cls, username):
@@ -163,8 +155,8 @@ class UserModel(db.Model):
     @classmethod
     def delete_all(cls):
         try:
-            num_rows_deleted = db.session.query(cls).delete()
-            db.session.commit()
+            num_rows_deleted = db_session.query(cls).delete()
+            db_session.commit()
             return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
         except:
             return {'message': 'Something went wrong'}
@@ -178,18 +170,18 @@ class UserModel(db.Model):
         return sha256.verify(password, hash)
 
 
-class PromoterModel(db.Model):
+class PromoterModel(Base):
     __tablename__ = 'promoters'
 
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(120), unique = True, nullable = False)
+    id = Column(Integer, primary_key = True)
+    name = Column(String(120), unique = True, nullable = False)
 
-    users = db.relationship("UserModel", order_by=UserModel.id, back_populates="promoter")
-    event_infos = db.relationship("EventInfo", order_by=EventInfo.id, back_populates="promoter")
+    users = relationship("UserModel", order_by=UserModel.id, back_populates="promoter")
+    event_infos = relationship("EventInfo", order_by=EventInfo.id, back_populates="promoter")
 
     def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
     def find_by_name(cls, name):
@@ -206,14 +198,14 @@ class PromoterModel(db.Model):
 
 
 #for when a user logs out, so we can disable their keys
-class RevokedTokenModel(db.Model):
+class RevokedTokenModel(Base):
     __tablename__ = 'revoked_tokens'
-    id = db.Column(db.Integer, primary_key = True)
-    jti = db.Column(db.String(120))
+    id = Column(Integer, primary_key = True)
+    jti = Column(String(120))
 
     def add(self):
-        db.session.add(self)
-        db.session.commit()
+        db_session.add(self)
+        db_session.commit()
 
     @classmethod
     def is_jti_blacklisted(cls, jti):
