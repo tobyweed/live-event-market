@@ -72,7 +72,7 @@ class RegistrationForm extends Component {
 					<input
 						className="form-item"
 						placeholder="Profile Image Url"
-						name="proPic"
+						name="proPicUrl"
 						type="text"
 						onChange={this.handleChange}
 					/>

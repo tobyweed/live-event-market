@@ -13,7 +13,9 @@ api = Api(app) #make an Flask_RESTful api for the app
 #configure jwt
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(0,10800)
+# currently have access token expiration disabled until I can figure out the token refresh bug (Tokens refresh, but only after refreshing the page)
+# app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(0,10800)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 jwt = JWTManager(app)
 
 #create all db tables

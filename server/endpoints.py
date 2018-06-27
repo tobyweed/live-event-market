@@ -3,6 +3,7 @@ from sqlalchemy import update
 from datetime import datetime
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 import json
+from dateutil import parser
 
 from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, UserSchemaWithoutPass, PromoterSchema, EventSchema, EventInfoSchema)
 from database import db_session
@@ -38,23 +39,6 @@ class SearchEvents(Resource):
             return {'message':'Something went wrong.'},500
 
 
-#return all events with a particular promoter_name (COMMENTED OUT BC MAY NOT BE NECESSARY)
-# class GetEventIdsByPromoter(Resource):
-#     def get(self, promoter_name):
-#         if not promoter_name: #make sure there is a search term
-#             return {'message':'Please enter a promoter name to get the events associated with it.'}
-#         promoter = PromoterModel.find_by_name(promoter_name)
-#         if not promoter: #check if the queried promoter exists
-#             return {'message':'That promoter does not exist.'}
-#         events = EventInfo.find_ids_by_promoter(promoter_name)
-#         if not events: #check if the promoter has any associated events
-#             return {'message':'That promoter has not created any events.'}
-#         try:
-#             return events #return a list of ids
-#         except:
-#             return {'message':'Something went wrong.'},500
-
-
 
 #return all the data of one event_info and all of its events. Query based on id #.
 class OneEvent(Resource):
@@ -78,6 +62,7 @@ class CreateEvent(Resource):
     def post(self):
         # get json
         data = request.get_json()
+        print(data)
         #get current user
         current_user_jwt = get_jwt_identity()
         current_user = UserModel.find_by_username(current_user_jwt)
@@ -87,8 +72,15 @@ class CreateEvent(Resource):
         if not current_user_promoter:
             return {'message': 'You cannot create events without a promoter account'}
 
+        #convert all datetime strings into strings which marshmallow can load (marshmallow requires ISO 8601 format including seconds)
+        for i in range(len(data['events'])):
+            data['events'][i]['start_date'] = str(parser.parse(data['events'][i]['start_date']))
+            data['events'][i]['end_date'] = str(parser.parse(data['events'][i]['end_date']))
+
+
         # create event_info out of json
         event_info = event_info_schema.load(data)
+        print(event_info)
         new_event_info = EventInfo(
             name = event_info.data['name']
         )
@@ -109,19 +101,16 @@ class CreateEvent(Resource):
         promoter = PromoterModel.find_by_name(current_user_promoter)
         promoter.event_infos.append(new_event_info)
 
-        # try:
-        new_event.save_to_db()
-        new_event_info.save_to_db()
-        promoter.save_to_db()
-        #return json serialized promoter's list of event_ids, which now includes the new event
-        ret = promoter_schema.dump(promoter)
-        print(ret.data['event_infos'])
-        return ret.data['event_infos']
-            # return {
-            #     'message': 'Event {} was created'.format(data['name'])
-            # }
-        # except:
-        #     return {'message': 'Something went wrong'}, 500
+        try:
+            new_event.save_to_db()
+            new_event_info.save_to_db()
+            promoter.save_to_db()
+            #return json serialized promoter's list of event_ids, which now includes the new event
+            ret = promoter_schema.dump(promoter)
+            print(ret.data['event_infos'])
+            return ret.data['event_infos']
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 

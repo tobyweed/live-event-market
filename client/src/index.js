@@ -13,10 +13,11 @@ import rootReducer from './js/reducers/';
 
 import App from './js/components/App';
 import AuthService from './js/utils/auth/AuthService';
+import AuthGate from './js/components/Auth/AuthGate';
 
 const Auth = new AuthService();
 
-function run() {
+function runApp() {
 	const persistConfig = {
 		key: 'root',
 		storage
@@ -39,7 +40,17 @@ function run() {
 	registerServiceWorker();
 }
 
-//before running anything, set headers and refresh token if necessary
-Auth.initialize().then(res => {
-	run();
-});
+function runAuthGate() {
+	ReactDOM.render(<AuthGate />, document.getElementById('root'));
+}
+
+//BaseAuth stuff is for login protection for site during development, will be removed for production
+let baseAuthIsPassed = localStorage.getItem('baseAuthIsPassed');
+if (baseAuthIsPassed === 'yes') {
+	//before running anything, set headers and refresh token if necessary
+	Auth.initialize().then(res => {
+		runApp();
+	});
+} else {
+	runAuthGate();
+}

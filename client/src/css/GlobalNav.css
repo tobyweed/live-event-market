@@ -14,11 +14,26 @@ div.navbar {
 	/* changes with font!!! carefully test */
 	margin-top: 2.9vh;
 }
+
 img.navbar {
 	height: 6vh;
 	width: auto;
 	padding: 2vh 0;
 }
+
+.pro-pic {
+	width: 6vh;
+	height: 6vh;
+	/* position: relative; */
+	overflow: hidden;
+}
+
+.pro-pic img {
+	height: 6vh;
+	width: auto;
+	padding: 2vh 0;
+}
+
 .left {
 	float: left;
 }

@@ -24,14 +24,21 @@ class AccountEvents extends Component {
 			<div>
 				<h4>{eventInfo.name}</h4>
 				Dates & Locations:
-				{eventInfo.events.map(function(event, i) {
-					return (
-						<ul key={i}>
-							<li>Start Date: {event.start_date}</li>
-							<li>End Date: {event.end_date}</li>
-						</ul>
-					);
-				})}
+				<ul>
+					{eventInfo.events.map(function(event, i) {
+						const start_date = new Date(event.start_date);
+						const end_date = new Date(event.end_date);
+						return (
+							<li key={i}>
+								Event {i + 1}
+								<ul>
+									<li>Start Date: {start_date.toString()}</li>
+									<li>End Date: {end_date.toString()}</li>
+								</ul>
+							</li>
+						);
+					})}
+				</ul>
 			</div>
 		) : (
 			<span>

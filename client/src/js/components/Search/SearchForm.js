@@ -32,32 +32,31 @@ class SearchForm extends Component {
 
 	render() {
 		return (
-			<div className="form">
-				<div className="form_content">
+			<div>
+				<div>
 					<form onSubmit={this.handleFormSubmit}>
-						{/* value={this.state.initialContent} */}
+						<h6>Search by Name:</h6>
 						<input
-							className="button_plain form_search"
 							placeholder="Search Events"
 							value={this.state.searchName}
 							name="searchName"
 							type="text"
 							onChange={this.handleChange}
-							required
 						/>
-						{/*<input
-						className="form-item"
-						placeholder="Enter Password"
-						name="password"
-						type="password"
-						onChange={this.handleChange}
-						required
-					/>*/}
+						<br />
+						<h6>Search by Date:</h6>
 						<input
-							className="button_color form_submit"
-							type="submit"
-							value="Search"
+							name="start_date"
+							type="datetime-local"
+							onChange={this.handleChange}
 						/>
+						<input
+							name="end_date"
+							type="datetime-local"
+							onChange={this.handleChange}
+						/>
+						<br />
+						<input type="submit" value="Search" />
 					</form>
 					<p>{this.state.errorMessage}</p>
 				</div>

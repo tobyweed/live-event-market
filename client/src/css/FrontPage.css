@@ -34,36 +34,3 @@ img.video_content {
 	position: absolute;
 	width: 55vh;
 }
-.from {
-	grid-area: form;
-	position: relative;
-}
-.form_content {
-	left: 3vh;
-	position: relative;
-	width: 55vh;
-}
-.form_grid {
-	display: grid;
-	grid-gap: 2vh;
-	grid-template-areas: 'form_search form_search form_submit' 'form_artist form_event form_promoter';
-	grid-template-columns: 33.33% 33.33 33.33%;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-}
-.form_search {
-	grid-area: form_search;
-}
-.form_submit {
-	grid-area: form_submit;
-}
-.form_artist {
-	grid-area: form_artist;
-}
-.form_event {
-	grid-area: form_event;
-}
-.form_promoter {
-	grid-area: form_promoter;
-}

@@ -15,7 +15,7 @@ class EditAccount extends Component {
 			lastName: props.userData.lastName,
 			email: props.userData.email,
 			phoneNumber: props.userData.phoneNumber,
-			proPic: props.userData.proPic,
+			proPicUrl: props.userData.proPicUrl,
 			organization: props.userData.organization
 		};
 
@@ -71,8 +71,8 @@ class EditAccount extends Component {
 								<input
 									className="form-item"
 									placeholder="Profile Image Url"
-									value={this.state.proPic}
-									name="proPic"
+									value={this.state.proPicUrl}
+									name="proPicUrl"
 									type="text"
 									onChange={this.handleChange}
 								/>
@@ -121,7 +121,7 @@ class EditAccount extends Component {
 				lastName: this.state.lastName,
 				email: this.state.email,
 				phoneNumber: this.state.phoneNumber,
-				proPic: this.state.proPic,
+				proPicUrl: this.state.proPicUrl,
 				organization: this.state.organization
 			})
 			.then(res => {
@@ -132,7 +132,7 @@ class EditAccount extends Component {
 						lastName: res.data.lastName,
 						email: res.data.email,
 						phoneNumber: res.data.phoneNumber,
-						proPic: res.data.proPic,
+						proPicUrl: res.data.proPicUrl,
 						organization: res.data.organization
 					})
 				);

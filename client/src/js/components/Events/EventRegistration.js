@@ -3,18 +3,23 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import { updatePromoter } from '../../actions';
 import AuthService from '../../utils/auth/AuthService';
+import update from 'immutability-helper';
 
 class EventRegistration extends Component {
 	constructor() {
 		super();
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
+		this.handleEventChange = this.handleEventChange.bind(this);
+		this.handleAddEvent = this.handleAddEvent.bind(this);
+		this.handleRemoveEvent = this.handleRemoveEvent.bind(this);
 
 		this.Auth = new AuthService();
 	}
 
 	state = {
-		errorMessage: ''
+		errorMessage: '',
+		events: [{ start_date: '', end_date: '' }]
 	};
 
 	render() {
@@ -29,20 +34,38 @@ class EventRegistration extends Component {
 						type="text"
 						onChange={this.handleChange}
 					/>
-					<input
-						className="form-item"
-						placeholder="Enter Event Start Date"
-						name="start_date"
-						type="text"
-						onChange={this.handleChange}
-					/>
-					<input
-						className="form-item"
-						placeholder="Enter Event End Date"
-						name="end_date"
-						type="text"
-						onChange={this.handleChange}
-					/>
+					{/*Add nested Events which can be added or subtracted from state*/}
+					<br />
+					Events:
+					<ul>
+						{this.state.events.map((event, i) => (
+							<li key={i}>
+								<input
+									placeholder="Enter Event Start Date"
+									name="start_date"
+									type="datetime-local"
+									onChange={this.handleEventChange(i)}
+								/>
+								<input
+									placeholder="Enter Event End Date"
+									name="end_date"
+									type="datetime-local"
+									onChange={this.handleEventChange(i)}
+								/>
+							</li>
+						))}
+						<li>
+							Add or Remove an Event:
+							<button type="button" onClick={this.handleAddEvent}>
+								+
+							</button>
+							/
+							<button type="button" onClick={this.handleRemoveEvent}>
+								-
+							</button>
+						</li>
+					</ul>
+					<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
 				{this.state.errorMessage}
@@ -56,6 +79,31 @@ class EventRegistration extends Component {
 		});
 	}
 
+	handleEventChange = i => e => {
+		let newEvents = update(this.state.events, {
+			[i]: {
+				[e.target.name]: { $set: e.target.value }
+			}
+		});
+		this.setState({
+			events: newEvents
+		});
+	};
+
+	handleRemoveEvent(e) {
+		let newEvents = update(this.state.events, {
+			$splice: [[0, 1]]
+		});
+		this.setState({ events: newEvents });
+	}
+
+	handleAddEvent(e) {
+		let newEvents = update(this.state.events, {
+			$push: [{ start_date: '', end_date: '' }]
+		});
+		this.setState({ events: newEvents });
+	}
+
 	handleFormSubmit(e) {
 		//Login on form submit
 		e.preventDefault();
@@ -63,12 +111,7 @@ class EventRegistration extends Component {
 		axios
 			.post('/create-event', {
 				name: this.state.name,
-				events: [
-					{
-						start_date: this.state.start_date,
-						end_date: this.state.end_date
-					}
-				]
+				events: this.state.events
 			})
 			.then(res => {
 				//if we get data in our response and that data is an array, then add that data to state

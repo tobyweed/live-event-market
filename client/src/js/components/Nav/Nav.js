@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import '../../../css/GlobalNav.css';
 import master_logo from '../../../images/master_logo.png';
 import blank_prof from '../../../images/blank_prof.png';
@@ -46,12 +48,22 @@ class Nav extends Component {
 					</li>
 					{loggedIn ? (
 						<li className="navbar right">
-							<Link to="/account">
-								<img
-									className="navbar"
-									src={blank_prof}
-									alt="blank profile icon"
-								/>
+							<Link className="pro-pic" to="/account">
+								{this.props.userData.proPicUrl ? (
+									<img
+										src={this.props.userData.proPicUrl}
+										onError={e => {
+											e.target.src = blank_prof;
+										}}
+										alt="User Profile"
+									/>
+								) : (
+									<img
+										className="navbar"
+										src={blank_prof}
+										alt="blank profile icon"
+									/>
+								)}
 							</Link>
 						</li>
 					) : (
@@ -110,4 +122,10 @@ class Nav extends Component {
 	}
 }
 
-export default withRouter(Nav);
+function mapStateToProps(state) {
+	return {
+		userData: state.idData.userData
+	};
+}
+
+export default connect(mapStateToProps)(withRouter(Nav));

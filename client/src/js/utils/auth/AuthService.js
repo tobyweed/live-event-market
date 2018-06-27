@@ -35,7 +35,7 @@ class AuthService {
 				lastName: data.lastName,
 				email: data.email,
 				phoneNumber: data.phoneNumber,
-				proPic: data.proPic,
+				proPicUrl: data.proPicUrl,
 				organization: data.organization
 			})
 			.then(res => {
