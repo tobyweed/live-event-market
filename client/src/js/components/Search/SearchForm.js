@@ -9,7 +9,9 @@ class SearchForm extends Component {
 
 		this.state = {
 			errorMessage: '',
-			searchName: ''
+			searchName: '',
+			start_date: '',
+			end_date: ''
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -24,9 +26,13 @@ class SearchForm extends Component {
 
 	componentDidMount() {
 		let query = qs.parse(this.props.location.search.slice(1));
-		let initialSearchName = query.name;
-		if (initialSearchName) {
-			this.setState({ searchName: initialSearchName });
+		let initialSearch = query;
+		if (initialSearch) {
+			this.setState({
+				searchName: initialSearch.name,
+				start_date: initialSearch.start_date,
+				end_date: initialSearch.end_date
+			});
 		}
 	}
 
@@ -47,11 +53,13 @@ class SearchForm extends Component {
 						<h6>Search by Date:</h6>
 						<input
 							name="start_date"
+							value={this.state.start_date}
 							type="datetime-local"
 							onChange={this.handleChange}
 						/>
 						<input
 							name="end_date"
+							value={this.state.end_date}
 							type="datetime-local"
 							onChange={this.handleChange}
 						/>
