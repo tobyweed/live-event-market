@@ -62,7 +62,6 @@ class CreateEvent(Resource):
     def post(self):
         # get json
         data = request.get_json()
-        print(data)
         #get current user
         current_user_jwt = get_jwt_identity()
         current_user = UserModel.find_by_username(current_user_jwt)
@@ -72,15 +71,19 @@ class CreateEvent(Resource):
         if not current_user_promoter:
             return {'message': 'You cannot create events without a promoter account'}
 
-        #convert all datetime strings into strings which marshmallow can load (marshmallow requires ISO 8601 format including seconds)
+        #convert all datetime strings into strings which marshmallow can load (marshmallow requires ISO 8601 format INCLUDING SECONDS)
         for i in range(len(data['events'])):
-            data['events'][i]['start_date'] = str(parser.parse(data['events'][i]['start_date']))
-            data['events'][i]['end_date'] = str(parser.parse(data['events'][i]['end_date']))
-
+            try:
+                data['events'][i]['start_date'] = str(parser.parse(data['events'][i]['start_date']))
+            except:
+                print("No start date")
+            try:
+                data['events'][i]['end_date'] = str(parser.parse(data['events'][i]['end_date']))
+            except:
+                print("No start date")
 
         # create event_info out of json
         event_info = event_info_schema.load(data)
-        print(event_info)
         new_event_info = EventInfo(
             name = event_info.data['name']
         )
@@ -88,11 +91,14 @@ class CreateEvent(Resource):
         # create associated event(s) out of nested object(s), single if single plural else
         events = event_info.data['events']
         for i in range(len(events)):
-            start_date = events[i]['start_date']
-            end_date = events[i]['end_date']
             new_event = Event(
-                start_date = start_date,
-                end_date = end_date
+                start_date = events[i]['start_date'],
+                end_date = events[i]['end_date'],
+                country_code = events[i]['country_code'],
+                administrative_area = events[i]['administrative_area'],
+                locality = events[i]['locality'],
+                postal_code = events[i]['postal_code'],
+                thoroughfare = events[i]['thoroughfare']
             )
             # append created Events to created event_info
             new_event_info.events.append(new_event)
@@ -107,7 +113,6 @@ class CreateEvent(Resource):
             promoter.save_to_db()
             #return json serialized promoter's list of event_ids, which now includes the new event
             ret = promoter_schema.dump(promoter)
-            print(ret.data['event_infos'])
             return ret.data['event_infos']
         except:
             return {'message': 'Something went wrong'}, 500

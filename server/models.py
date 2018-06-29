@@ -28,8 +28,13 @@ class UserSchemaWithoutPass(Schema):
     promoter_name = fields.Str()
 
 class EventSchema(Schema):
-    start_date = fields.DateTime()
-    end_date = fields.DateTime()
+    start_date = fields.DateTime(missing=None)
+    end_date = fields.DateTime(missing=None)
+    country_code = fields.Str(missing=None)
+    administrative_area = fields.Str(missing=None)
+    locality = fields.Str(missing=None)
+    postal_code = fields.Integer(missing=None)
+    thoroughfare = fields.Str(missing=None)
     event_name = fields.Str()
 
 class EventInfoSchema(Schema):
@@ -59,9 +64,16 @@ class Event(Base):
     __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key = True)
+    event_id = Column(Integer, ForeignKey('event_info.id'))
+    #====Date====#
     start_date = Column(DateTime)
     end_date = Column(DateTime)
-    event_id = Column(Integer, ForeignKey('event_info.id'))
+    #====Location====#
+    country_code = Column(String(2))
+    administrative_area = Column(String(120)) #state/province
+    locality = Column(String(120)) #city/town
+    postal_code = Column(Integer)
+    thoroughfare = Column(String(120)) #street address
 
     event_info = relationship("EventInfo", back_populates="events")
 
