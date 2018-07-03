@@ -27,14 +27,17 @@ class UserSchemaWithoutPass(Schema):
     organization = fields.Str(missing=None)
     promoter_name = fields.Str()
 
-class EventSchema(Schema):
-    start_date = fields.DateTime(missing=None)
-    end_date = fields.DateTime(missing=None)
+class LocationSchema(Schema):
     country_code = fields.Str(missing=None)
     administrative_area = fields.Str(missing=None)
     locality = fields.Str(missing=None)
-    postal_code = fields.Integer(missing=None)
+    postal_code = fields.Str(missing=None)
     thoroughfare = fields.Str(missing=None)
+
+class EventSchema(Schema):
+    start_date = fields.DateTime(missing=None)
+    end_date = fields.DateTime(missing=None)
+    location = fields.Nested(LocationSchema, many=False, missing={})
     event_name = fields.Str()
 
 class EventInfoSchema(Schema):
@@ -58,6 +61,18 @@ another (Event) has all of the date and location info.
 The eventinfo to event relationship is one to many.
 There is another one to many join for event types, and another for images.
 '''
+class Location(Base):
+    __tablename__ = 'Location'
+    id = Column(Integer, primary_key=True)
+    event_id = Column(Integer, ForeignKey('event.id'))
+
+    country_code = Column(String(2))
+    administrative_area = Column(String(120)) #state/province
+    locality = Column(String(120)) #city/town
+    postal_code = Column(String(120))
+    thoroughfare = Column(String(120)) #street address
+
+    event = relationship("Event", back_populates="location")
 
 class Event(Base):
     __tablename__ = 'event'
@@ -68,14 +83,9 @@ class Event(Base):
     #====Date====#
     start_date = Column(DateTime)
     end_date = Column(DateTime)
-    #====Location====#
-    country_code = Column(String(2))
-    administrative_area = Column(String(120)) #state/province
-    locality = Column(String(120)) #city/town
-    postal_code = Column(Integer)
-    thoroughfare = Column(String(120)) #street address
 
     event_info = relationship("EventInfo", back_populates="events")
+    location = relationship("Location", uselist=False, back_populates="event")
 
     def save_to_db(self):
         db_session.add(self)
@@ -111,18 +121,32 @@ class EventInfo(Base):
         return cls.query.filter_by(id = id).first()
 
     @classmethod
-    def search(cls,name,start_date,end_date):
+    # def search(cls,name,start_date,end_date,country_code,administrative_area,locality,postal_code,thoroughfare):
+    def search(cls,name,start_date,end_date,location):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
+
         search = EventInfo.query
         if name:
             search = search.filter(EventInfo.name.ilike('%'+name+'%'))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
-            search = search.filter(Event.start_date <= start_date)
+            search = search.filter(EventInfo.events.any(Event.start_date >= start_date))
         if end_date:
-            search = search.filter(Event.end_date >= end_date)
-        #locations: proximity, if possible
+            search = search.filter(EventInfo.events.any(Event.end_date <= end_date))
+        #locations: nested so that one can only search by administrative_area if they are also searching by country_code, etc.
+        if location['country_code']:
+            search = search.filter(EventInfo.events.any(Event.location.has(Location.country_code == location['country_code'])))
+            if location['administrative_area']:
+                search = search.filter(EventInfo.events.any(Event.location.has(Location.administrative_area == location['administrative_area'])))
+                if location['locality']:
+                    search = search.filter(EventInfo.events.any(Event.location.has(Location.locality == location['locality'])))
+                    if location['postal_code']:
+                        search = search.filter(EventInfo.events.any(Event.location.has(Location.postal_code == location['postal_code'])))
+                        if location['thoroughfare']:
+                            search = search.filter(EventInfo.events.any(Event.location.has(Location.thoroughfare == location['thoroughfare'])))
+
+
         #types: Compares the query list to the event list. Exact
         #series, ticketed, private: boolean values, exact
         return search.with_entities(EventInfo.id).distinct().all() #return only ids, not whole objects. Distinct avoids duplicates
@@ -206,7 +230,6 @@ class PromoterModel(Base):
                 'name': x.name
             }
         return {'users': list(map(lambda x: to_json(x), PromoterModel.query.all()))}
-
 
 
 #for when a user logs out, so we can disable their keys

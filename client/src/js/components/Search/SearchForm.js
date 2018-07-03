@@ -87,7 +87,13 @@ class SearchForm extends Component {
 		var args = [
 			this.state.searchName,
 			this.state.start_date,
-			this.state.end_date
+			this.state.end_date,
+			this.state.start_date,
+			this.state.country_code,
+			this.state.administrative_area,
+			this.state.locality,
+			this.state.postal_code,
+			this.state.thoroughfare
 		];
 		args.forEach((arg, i) => {
 			args[i] = arg === undefined ? '' : arg;
@@ -98,7 +104,17 @@ class SearchForm extends Component {
 				'&start_date=' +
 				args[1] +
 				'&end_date=' +
-				args[2]
+				args[2] +
+				'&country_code=' +
+				args[3] +
+				'&administrative_area=' +
+				args[4] +
+				'&locality=' +
+				args[5] +
+				'&postal_code=' +
+				args[6] +
+				'&thoroughfare=' +
+				args[7]
 		);
 	}
 }

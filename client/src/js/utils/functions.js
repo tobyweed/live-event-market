@@ -9,7 +9,12 @@ export function search(name, start_date, end_date) {
 					'&start_date=' +
 					start_date +
 					'&end_date=' +
-					end_date
+					end_date +
+					'&country_code=' +
+					'&administrative_area=' +
+					'&locality=' +
+					'&postal_code=' +
+					'&thoroughfare='
 			)
 			.then(res => {
 				resolve(res);

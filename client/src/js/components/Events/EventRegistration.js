@@ -5,6 +5,8 @@ import { updatePromoter } from '../../actions';
 import AuthService from '../../utils/auth/AuthService';
 import update from 'immutability-helper';
 
+import NestedEventRegistration from './NestedEventRegistration';
+
 class EventRegistration extends Component {
 	constructor() {
 		super();
@@ -13,6 +15,7 @@ class EventRegistration extends Component {
 		this.handleEventChange = this.handleEventChange.bind(this);
 		this.handleAddEvent = this.handleAddEvent.bind(this);
 		this.handleRemoveEvent = this.handleRemoveEvent.bind(this);
+		this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
 
 		this.Auth = new AuthService();
 	}
@@ -33,38 +36,44 @@ class EventRegistration extends Component {
 						name="name"
 						type="text"
 						onChange={this.handleChange}
+						required
 					/>
-					{/*Add nested Events which can be added or subtracted from state*/}
 					<br />
-					Events:
-					<ul>
-						{this.state.events.map((event, i) => (
-							<li key={i}>
-								<input
-									placeholder="Enter Event Start Date"
-									name="start_date"
-									type="datetime-local"
-									onChange={this.handleEventChange(i)}
-								/>
-								<input
-									placeholder="Enter Event End Date"
-									name="end_date"
-									type="datetime-local"
-									onChange={this.handleEventChange(i)}
-								/>
-							</li>
-						))}
-						<li>
-							Add or Remove an Event:
-							<button type="button" onClick={this.handleAddEvent}>
-								+
-							</button>
-							/
-							<button type="button" onClick={this.handleRemoveEvent}>
-								-
-							</button>
-						</li>
-					</ul>
+					<label htmlFor="series">Series: </label>
+					<input
+						className="form-item"
+						name="series"
+						type="checkbox"
+						onChange={this.handleCheckboxChange}
+					/>
+					{/*Add nested Events which can be added or subtracted from state if series is selected, otherwise add only one Event form*/}
+					{this.state.series ? (
+						<div>
+							<br />
+							Individual Events:
+							<ul>
+								{this.state.events.map((event, i) => (
+									<li key={i}>
+										<NestedEventRegistration
+											onChange={this.handleEventChange(i)}
+										/>
+									</li>
+								))}
+								<li>
+									Add or Remove an Event:
+									<button type="button" onClick={this.handleAddEvent}>
+										+
+									</button>
+									/
+									<button type="button" onClick={this.handleRemoveEvent}>
+										-
+									</button>
+								</li>
+							</ul>
+						</div>
+					) : (
+						<NestedEventRegistration onChange={this.handleEventChange(0)} />
+					)}
 					<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
@@ -77,6 +86,13 @@ class EventRegistration extends Component {
 		this.setState({
 			[e.target.name]: e.target.value
 		});
+	}
+
+	handleCheckboxChange(e) {
+		let target = e.target.name;
+		this.setState(prevState => ({
+			[target]: !prevState[target]
+		}));
 	}
 
 	handleEventChange = i => e => {

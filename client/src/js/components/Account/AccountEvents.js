@@ -1,10 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import EventRegistration from '../Events/EventRegistration';
+import AuthService from '../../utils/auth/AuthService';
+import { refreshData } from '../../actions';
 
 import EventListing from '../Events/EventListing';
 
 class AccountEvents extends Component {
+	constructor() {
+		super();
+		this.Auth = new AuthService();
+	}
+
+	componentWillMount() {
+		this.Auth.getData().then(res => {
+			this.props.dispatch(refreshData(res)); //add that to redux state
+		});
+	}
+
 	render() {
 		const eventInfos = this.props.promoterData.event_infos;
 

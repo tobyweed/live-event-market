@@ -5,7 +5,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 import json
 from dateutil import parser
 
-from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, UserSchema, UserSchemaWithoutPass, PromoterSchema, EventSchema, EventInfoSchema)
+from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, Location, UserSchema, UserSchemaWithoutPass, PromoterSchema, LocationSchema, EventSchema, EventInfoSchema)
 from database import db_session
 #initialize schemas
 user_schema = UserSchema()
@@ -25,11 +25,16 @@ class SearchEvents(Resource):
         name = args['name']
         start_date = args['start_date']
         end_date = args['end_date']
-        # if not name: #name is required
-        #     return {'message':'Please enter a search term.'}
-
+        location = {
+            "country_code" : args['country_code'],
+            "administrative_area" : args['administrative_area'],
+            "locality": args['locality'],
+            "postal_code": args['postal_code'],
+            "thoroughfare": args['thoroughfare']
+        }
         #get list of event_info ids of event_infos matching the search query
-        event_ids = EventInfo.search(name, start_date, end_date)
+        event_ids = EventInfo.search(name,start_date,end_date,location)
+        # event_ids = EventInfo.search(name,start_date,end_date,country_code,administrative_area,locality,postal_code,thoroughfare)
         if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
 
@@ -45,6 +50,7 @@ class OneEvent(Resource):
     def get(self, id):
         #get the right event_info
         event_info = EventInfo.find_by_id(id)
+        # print(getattr(event,"location"))
         if not event_info:
             return {'message': 'An event with that id does not exist.'}, 500
         #serialize event_info
@@ -76,29 +82,34 @@ class CreateEvent(Resource):
             try:
                 data['events'][i]['start_date'] = str(parser.parse(data['events'][i]['start_date']))
             except:
-                print("No start date")
+                data['events'][i]['start_date'] = None
             try:
                 data['events'][i]['end_date'] = str(parser.parse(data['events'][i]['end_date']))
             except:
-                print("No start date")
+                data['events'][i]['end_date'] = None
 
         # create event_info out of json
         event_info = event_info_schema.load(data)
+        print(event_info.errors) #for debugging
         new_event_info = EventInfo(
             name = event_info.data['name']
         )
 
         # create associated event(s) out of nested object(s), single if single plural else
         events = event_info.data['events']
+        print(events)
         for i in range(len(events)):
+            location = Location(
+                country_code = events[i]['location']['country_code'],
+                administrative_area = events[i]['location']['administrative_area'],
+                locality = events[i]['location']['locality'],
+                postal_code = events[i]['location']['postal_code'],
+                thoroughfare = events[i]['location']['thoroughfare']
+            )
             new_event = Event(
                 start_date = events[i]['start_date'],
                 end_date = events[i]['end_date'],
-                country_code = events[i]['country_code'],
-                administrative_area = events[i]['administrative_area'],
-                locality = events[i]['locality'],
-                postal_code = events[i]['postal_code'],
-                thoroughfare = events[i]['thoroughfare']
+                location = location
             )
             # append created Events to created event_info
             new_event_info.events.append(new_event)
@@ -107,15 +118,15 @@ class CreateEvent(Resource):
         promoter = PromoterModel.find_by_name(current_user_promoter)
         promoter.event_infos.append(new_event_info)
 
-        try:
-            new_event.save_to_db()
-            new_event_info.save_to_db()
-            promoter.save_to_db()
-            #return json serialized promoter's list of event_ids, which now includes the new event
-            ret = promoter_schema.dump(promoter)
-            return ret.data['event_infos']
-        except:
-            return {'message': 'Something went wrong'}, 500
+        # try:
+        new_event.save_to_db()
+        new_event_info.save_to_db()
+        promoter.save_to_db()
+        #return json serialized promoter's list of event_ids, which now includes the new event
+        ret = promoter_schema.dump(promoter)
+        return ret.data['event_infos']
+        # except:
+        # return {'message': 'Something went wrong'}, 500
 
 
 

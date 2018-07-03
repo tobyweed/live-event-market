@@ -25,6 +25,7 @@ class AccountEvents extends Component {
 				<h4>{eventInfo.name}</h4>
 				Dates & Locations:
 				<ul>
+					{/* Map eventinfo events array and format each event to be displayed*/}
 					{eventInfo.events.map(function(event, i) {
 						const start_date = new Date(event.start_date);
 						const end_date = new Date(event.end_date);
@@ -32,8 +33,46 @@ class AccountEvents extends Component {
 							<li key={i}>
 								Event {i + 1}
 								<ul>
-									<li>Start Date: {start_date.toString()}</li>
-									<li>End Date: {end_date.toString()}</li>
+									{event.start_date ? (
+										<li>Start Date: {start_date.toString()}</li>
+									) : (
+										''
+									)}
+									{event.end_date ? (
+										<li>End Date: {end_date.toString()}</li>
+									) : (
+										''
+									)}
+									{/* Check if the event has a location attribute and whether that location
+										attribute has any non-null values before trying to display it*/}
+									{event.location &&
+									Object.values(event.location).some(el => {
+										return el !== null;
+									}) ? (
+										<li>
+											Location:&nbsp;
+											{event.location.thoroughfare
+												? event.location.thoroughfare
+												: ''}
+											,&nbsp;
+											{event.location.locality ? event.location.locality : ''}
+											&nbsp;
+											{event.location.administrative_area
+												? event.location.administrative_area
+												: ''}
+											&nbsp;
+											{event.location.postal_code
+												? event.location.postal_code
+												: ''}
+											,&nbsp;
+											{event.location.country_code
+												? event.location.country_code
+												: ''}
+											&nbsp;
+										</li>
+									) : (
+										''
+									)}
 								</ul>
 							</li>
 						);
