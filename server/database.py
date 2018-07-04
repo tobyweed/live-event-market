@@ -13,5 +13,5 @@ Base = declarative_base()
 Base.query = db_session.query_property()
 
 def init_db():
-    from models import UserModel, RevokedTokenModel, PromoterModel, EventInfo, Event
+    from models import UserModel, RevokedTokenModel, PromoterModel, EventInfo, Event, EventType
     Base.metadata.create_all(bind=engine)

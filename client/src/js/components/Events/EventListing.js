@@ -78,6 +78,16 @@ class AccountEvents extends Component {
 						);
 					})}
 				</ul>
+				{eventInfo.event_types[0] ? (
+					<div>
+						Type:
+						{eventInfo.event_types.map(function(event_type, i) {
+							return <span key={i}>&nbsp;{event_type.type}.&nbsp;</span>;
+						})}
+					</div>
+				) : (
+					''
+				)}
 			</div>
 		) : (
 			<span>

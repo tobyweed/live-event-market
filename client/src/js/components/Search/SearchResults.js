@@ -16,7 +16,17 @@ class Account extends Component {
 		//Listen for url changes and re-search based on the new query string
 		this.unlisten = this.props.history.listen(location => {
 			let query = qs.parse(location.search.slice(1));
-			this.searchEvents(query.name, query.start_date, query.end_date);
+			this.searchEvents(
+				query.name,
+				query.start_date,
+				query.end_date,
+				query.country_code,
+				query.administrative_area,
+				query.locality,
+				query.postal_code,
+				query.thoroughfare,
+				query.event_types
+			);
 		});
 	}
 
@@ -27,11 +37,41 @@ class Account extends Component {
 	componentDidMount() {
 		//Intialize results based on query string
 		let query = qs.parse(this.props.location.search.slice(1));
-		this.searchEvents(query.name, query.start_date, query.end_date);
+		this.searchEvents(
+			query.name,
+			query.start_date,
+			query.end_date,
+			query.country_code,
+			query.administrative_area,
+			query.locality,
+			query.postal_code,
+			query.thoroughfare,
+			query.event_types
+		);
 	}
 
-	searchEvents(name, start_date, end_date) {
-		search(name, start_date, end_date)
+	searchEvents(
+		name,
+		start_date,
+		end_date,
+		country_code,
+		administrative_area,
+		locality,
+		postal_code,
+		thoroughfare,
+		event_types
+	) {
+		search(
+			name,
+			start_date,
+			end_date,
+			country_code,
+			administrative_area,
+			locality,
+			postal_code,
+			thoroughfare,
+			event_types
+		)
 			.then(res => {
 				this.setState({ results: res }); //add that to redux state
 			})

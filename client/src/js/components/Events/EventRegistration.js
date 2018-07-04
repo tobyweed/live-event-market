@@ -13,16 +13,23 @@ class EventRegistration extends Component {
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 		this.handleEventChange = this.handleEventChange.bind(this);
+		this.handleEventLocationChange = this.handleEventLocationChange.bind(this);
 		this.handleAddEvent = this.handleAddEvent.bind(this);
 		this.handleRemoveEvent = this.handleRemoveEvent.bind(this);
-		this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+		this.handleBooleanCheckboxChange = this.handleBooleanCheckboxChange.bind(
+			this
+		);
+		this.handleEventTypeCheckboxChange = this.handleEventTypeCheckboxChange.bind(
+			this
+		);
 
 		this.Auth = new AuthService();
 	}
 
 	state = {
 		errorMessage: '',
-		events: [{ start_date: '', end_date: '' }]
+		events: [{ start_date: '', end_date: '', location: {} }],
+		event_types: []
 	};
 
 	render() {
@@ -30,6 +37,9 @@ class EventRegistration extends Component {
 			<div className="event-registration">
 				<h3>Create a New Event</h3>
 				<form onSubmit={this.handleFormSubmit}>
+					<label htmlFor="name">
+						<h5>Event Name: </h5>
+					</label>
 					<input
 						className="form-item"
 						placeholder="Enter Event Name"
@@ -39,23 +49,26 @@ class EventRegistration extends Component {
 						required
 					/>
 					<br />
-					<label htmlFor="series">Series: </label>
+					<label htmlFor="series">
+						<h5>Series: </h5>
+					</label>
 					<input
 						className="form-item"
 						name="series"
 						type="checkbox"
-						onChange={this.handleCheckboxChange}
+						onChange={this.handleBooleanCheckboxChange}
 					/>
 					{/*Add nested Events which can be added or subtracted from state if series is selected, otherwise add only one Event form*/}
 					{this.state.series ? (
 						<div>
 							<br />
-							Individual Events:
+							<h5>Individual Events: </h5>
 							<ul>
 								{this.state.events.map((event, i) => (
 									<li key={i}>
 										<NestedEventRegistration
 											onChange={this.handleEventChange(i)}
+											onLocationChange={this.handleEventLocationChange(i)}
 										/>
 									</li>
 								))}
@@ -72,9 +85,37 @@ class EventRegistration extends Component {
 							</ul>
 						</div>
 					) : (
-						<NestedEventRegistration onChange={this.handleEventChange(0)} />
+						<NestedEventRegistration
+							onChange={this.handleEventChange(0)}
+							onLocationChange={this.handleEventLocationChange(0)}
+						/>
 					)}
 					<br />
+					<h5>Type:</h5>
+					<input
+						type="checkbox"
+						name="event_types[]"
+						value="Music"
+						onChange={this.handleEventTypeCheckboxChange}
+					/>Music
+					<input
+						type="checkbox"
+						name="event_types[]"
+						value="Sports"
+						onChange={this.handleEventTypeCheckboxChange}
+					/>Sports
+					<input
+						type="checkbox"
+						name="event_types[]"
+						value="Food"
+						onChange={this.handleEventTypeCheckboxChange}
+					/>Food
+					<input
+						type="checkbox"
+						name="event_types[]"
+						value="Conferences"
+						onChange={this.handleEventTypeCheckboxChange}
+					/>Conferences<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
 				{this.state.errorMessage}
@@ -88,17 +129,55 @@ class EventRegistration extends Component {
 		});
 	}
 
-	handleCheckboxChange(e) {
+	handleBooleanCheckboxChange(e) {
 		let target = e.target.name;
+		//If we are checking or unchecking series, then remove all but one event
+		if (target === 'series') {
+			let newEvents = update(this.state.events, {
+				$splice: [[0, this.state.events.length - 1]]
+			});
+			this.setState({ events: newEvents });
+		}
+
 		this.setState(prevState => ({
+			//set the state to be the opposite of what it was before
 			[target]: !prevState[target]
 		}));
+	}
+
+	handleEventTypeCheckboxChange(e) {
+		const event_types = this.state.event_types;
+		let index;
+
+		if (e.target.checked) {
+			event_types.push({ type: e.target.value });
+		} else {
+			index = event_types.findIndex(el => {
+				return el.type === e.target.value;
+			});
+			event_types.splice(index, 1);
+		}
+		this.setState({ event_types: event_types });
+		console.log(event_types);
 	}
 
 	handleEventChange = i => e => {
 		let newEvents = update(this.state.events, {
 			[i]: {
 				[e.target.name]: { $set: e.target.value }
+			}
+		});
+		this.setState({
+			events: newEvents
+		});
+	};
+
+	handleEventLocationChange = i => e => {
+		let newEvents = update(this.state.events, {
+			[i]: {
+				location: {
+					[e.target.name]: { $set: e.target.value }
+				}
 			}
 		});
 		this.setState({
@@ -127,7 +206,8 @@ class EventRegistration extends Component {
 		axios
 			.post('/create-event', {
 				name: this.state.name,
-				events: this.state.events
+				events: this.state.events,
+				event_types: this.state.event_types
 			})
 			.then(res => {
 				//if we get data in our response and that data is an array, then add that data to state

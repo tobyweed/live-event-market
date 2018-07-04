@@ -5,7 +5,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 import json
 from dateutil import parser
 
-from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, Location, UserSchema, UserSchemaWithoutPass, PromoterSchema, LocationSchema, EventSchema, EventInfoSchema)
+from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, EventType, Location, UserSchema, UserSchemaWithoutPass, PromoterSchema, LocationSchema, EventSchema, EventInfoSchema, EventTypeSchema)
 from database import db_session
 #initialize schemas
 user_schema = UserSchema()
@@ -32,9 +32,9 @@ class SearchEvents(Resource):
             "postal_code": args['postal_code'],
             "thoroughfare": args['thoroughfare']
         }
+        event_types = args['event_types'][1:-1].split(','); #remove braces and parentheses and split the string into an array by commas
         #get list of event_info ids of event_infos matching the search query
-        event_ids = EventInfo.search(name,start_date,end_date,location)
-        # event_ids = EventInfo.search(name,start_date,end_date,country_code,administrative_area,locality,postal_code,thoroughfare)
+        event_ids = EventInfo.search(name,start_date,end_date,location,event_types)
         if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
 
@@ -97,7 +97,6 @@ class CreateEvent(Resource):
 
         # create associated event(s) out of nested object(s), single if single plural else
         events = event_info.data['events']
-        print(events)
         for i in range(len(events)):
             location = Location(
                 country_code = events[i]['location']['country_code'],
@@ -113,6 +112,15 @@ class CreateEvent(Resource):
             )
             # append created Events to created event_info
             new_event_info.events.append(new_event)
+
+        # create associated event(s) out of nested object(s), single if single plural else
+        event_types = event_info.data['event_types']
+        for i in range(len(event_types)):
+            new_event_type = EventType(
+                type = event_types[i]['type']
+            )
+            # append created Events to created event_info
+            new_event_info.event_types.append(new_event_type)
 
         # append create event_info to promoter of current user
         promoter = PromoterModel.find_by_name(current_user_promoter)

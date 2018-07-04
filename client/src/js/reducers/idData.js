@@ -24,7 +24,6 @@ const idData = (state = initialState, action) => {
 				promoterData: action.promoterData
 			};
 		case 'UPDATE_PROMOTER':
-			console.log(action);
 			return {
 				...state,
 				promoterData: {
