@@ -190,8 +190,6 @@ class OneUser(Resource):
             return {'message': 'Something went wrong'}, 500
 
 
-
-
 #this is a development route. Only leaving it here right now as an example of deletion
 # class AllUsers(Resource):
 #     def delete(self):
@@ -262,7 +260,6 @@ class AddUserToPromoter(Resource):
             }
         except:
             return {'message': 'Something went wrong.'}, 500
-
 
 #register a new promoter
 class PromoterRegistration(Resource):

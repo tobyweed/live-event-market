@@ -25,32 +25,33 @@ class SearchForm extends Component {
 	}
 
 	componentDidMount() {
-		let query = qs.parse(this.props.location.search.slice(1));
-		let initialSearch = query;
-		//If the search query has a string representing event types, make them into a nice array for prepopulating the form
-		let event_types = initialSearch.event_types;
-		let event_types_array = event_types.slice(1, -1).split(',');
-		if (event_types_array[0]) {
-			//only convert event_types to array if the first element is not null. This avoids setting an empty string as first element
-			event_types = event_types_array;
-		} else {
-			event_types = [];
-		}
-		//If the querystring series says "true", then set "series" to true
-		let isSeries = initialSearch.series === 'true';
-		//prepopulate state with values from the query string, for the form to use to populate itself
-		if (initialSearch) {
-			this.setState({
-				searchName: initialSearch.name,
-				start_date: initialSearch.start_date,
-				country_code: initialSearch.country_code,
-				administrative_area: initialSearch.administrative_area,
-				locality: initialSearch.locality,
-				postal_code: initialSearch.postal_code,
-				thoroughfare: initialSearch.thoroughfare,
-				event_types: event_types,
-				series: isSeries
-			});
+		let initialSearch = qs.parse(this.props.location.search.slice(1));
+		if (initialSearch.event_types) {
+			//If the search query has a string representing event types, make them into a nice array for prepopulating the form
+			let event_types = initialSearch.event_types;
+			let event_types_array = event_types.slice(1, -1).split(',');
+			if (event_types_array[0]) {
+				//only convert event_types to array if the first element is not null. This avoids setting an empty string as first element
+				event_types = event_types_array;
+			} else {
+				event_types = [];
+			}
+			//If the querystring series says "true", then set "series" to true
+			let isSeries = initialSearch.series === 'true';
+			//prepopulate state with values from the query string, for the form to use to populate itself
+			if (initialSearch) {
+				this.setState({
+					searchName: initialSearch.name,
+					start_date: initialSearch.start_date,
+					country_code: initialSearch.country_code,
+					administrative_area: initialSearch.administrative_area,
+					locality: initialSearch.locality,
+					postal_code: initialSearch.postal_code,
+					thoroughfare: initialSearch.thoroughfare,
+					event_types: event_types,
+					series: isSeries
+				});
+			}
 		}
 	}
 
