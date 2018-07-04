@@ -1,37 +1,29 @@
 import axios from 'axios';
 
-export function search(
-	name,
-	start_date,
-	end_date,
-	country_code,
-	administrative_area,
-	locality,
-	postal_code,
-	thoroughfare,
-	event_types
-) {
+export function search(query) {
 	return new Promise((resolve, reject) => {
 		axios
 			.get(
 				'/search-events?name=' +
-					name +
+					query.name +
 					'&start_date=' +
-					start_date +
+					query.start_date +
 					'&end_date=' +
-					end_date +
+					query.end_date +
 					'&country_code=' +
-					country_code +
+					query.country_code +
 					'&administrative_area=' +
-					administrative_area +
+					query.administrative_area +
 					'&locality=' +
-					locality +
+					query.locality +
 					'&postal_code=' +
-					postal_code +
+					query.postal_code +
 					'&thoroughfare=' +
-					thoroughfare +
+					query.thoroughfare +
 					'&event_types=' +
-					event_types
+					query.event_types +
+					'&series=' +
+					query.series
 			)
 			.then(res => {
 				resolve(res);

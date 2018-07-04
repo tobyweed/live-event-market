@@ -33,8 +33,9 @@ class SearchEvents(Resource):
             "thoroughfare": args['thoroughfare']
         }
         event_types = args['event_types'][1:-1].split(','); #remove braces and parentheses and split the string into an array by commas
+        series = True if args['series'] == 'true' else False #convert string 'true' or 'false' to boolean value
         #get list of event_info ids of event_infos matching the search query
-        event_ids = EventInfo.search(name,start_date,end_date,location,event_types)
+        event_ids = EventInfo.search(name,start_date,end_date,location,event_types,series)
         if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
 
@@ -92,7 +93,8 @@ class CreateEvent(Resource):
         event_info = event_info_schema.load(data)
         print(event_info.errors) #for debugging
         new_event_info = EventInfo(
-            name = event_info.data['name']
+            name = event_info.data['name'],
+            series = event_info.data['series']
         )
 
         # create associated event(s) out of nested object(s), single if single plural else

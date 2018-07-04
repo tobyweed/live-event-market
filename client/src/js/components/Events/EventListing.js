@@ -23,6 +23,8 @@ class AccountEvents extends Component {
 		return eventInfo ? (
 			<div>
 				<h4>{eventInfo.name}</h4>
+				Series: {eventInfo.series ? <span>Yes.</span> : <span>No.</span>}
+				<br />
 				Dates & Locations:
 				<ul>
 					{/* Map eventinfo events array and format each event to be displayed*/}

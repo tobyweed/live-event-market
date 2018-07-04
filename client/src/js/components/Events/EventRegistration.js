@@ -158,7 +158,6 @@ class EventRegistration extends Component {
 			event_types.splice(index, 1);
 		}
 		this.setState({ event_types: event_types });
-		console.log(event_types);
 	}
 
 	handleEventChange = i => e => {
@@ -206,6 +205,7 @@ class EventRegistration extends Component {
 		axios
 			.post('/create-event', {
 				name: this.state.name,
+				series: this.state.series,
 				events: this.state.events,
 				event_types: this.state.event_types
 			})

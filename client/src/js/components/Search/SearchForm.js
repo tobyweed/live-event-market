@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import qs from 'qs';
+import update from 'immutability-helper';
 
 import CountrySelector from '../Events/CountrySelector';
 
@@ -14,7 +15,12 @@ class SearchForm extends Component {
 		};
 
 		this.handleChange = this.handleChange.bind(this);
-		this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+		this.handleEventTypeCheckboxChange = this.handleEventTypeCheckboxChange.bind(
+			this
+		);
+		this.handleBooleanCheckboxChange = this.handleBooleanCheckboxChange.bind(
+			this
+		);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
 	}
 
@@ -23,11 +29,15 @@ class SearchForm extends Component {
 		let initialSearch = query;
 		//If the search query has a string representing event types, make them into a nice array for prepopulating the form
 		let event_types = initialSearch.event_types;
-		if (event_types) {
-			event_types = event_types.slice(1, -1).split(',');
+		let event_types_array = event_types.slice(1, -1).split(',');
+		if (event_types_array[0]) {
+			//only convert event_types to array if the first element is not null. This avoids setting an empty string as first element
+			event_types = event_types_array;
 		} else {
 			event_types = [];
 		}
+		//If the querystring series says "true", then set "series" to true
+		let isSeries = initialSearch.series === 'true';
 		//prepopulate state with values from the query string, for the form to use to populate itself
 		if (initialSearch) {
 			this.setState({
@@ -38,7 +48,8 @@ class SearchForm extends Component {
 				locality: initialSearch.locality,
 				postal_code: initialSearch.postal_code,
 				thoroughfare: initialSearch.thoroughfare,
-				event_types: event_types
+				event_types: event_types,
+				series: isSeries
 			});
 		}
 	}
@@ -114,29 +125,37 @@ class SearchForm extends Component {
 						name="event_types[]"
 						checked={this.state.event_types.includes('Music')}
 						value="Music"
-						onChange={this.handleCheckboxChange}
+						onChange={this.handleEventTypeCheckboxChange}
 					/>Music
 					<input
 						type="checkbox"
 						name="event_types[]"
 						checked={this.state.event_types.includes('Sports')}
 						value="Sports"
-						onChange={this.handleCheckboxChange}
+						onChange={this.handleEventTypeCheckboxChange}
 					/>Sports
 					<input
 						type="checkbox"
 						name="event_types[]"
 						checked={this.state.event_types.includes('Food')}
 						value="Food"
-						onChange={this.handleCheckboxChange}
+						onChange={this.handleEventTypeCheckboxChange}
 					/>Food
 					<input
 						type="checkbox"
 						name="event_types[]"
 						checked={this.state.event_types.includes('Conferences')}
 						value="Conferences"
-						onChange={this.handleCheckboxChange}
+						onChange={this.handleEventTypeCheckboxChange}
 					/>Conferences<br />
+					<h6>Other:</h6>
+					<input
+						type="checkbox"
+						name="series"
+						checked={this.state.series}
+						onChange={this.handleBooleanCheckboxChange}
+					/>Series
+					<br />
 					<input type="submit" value="Search" />
 				</form>
 				<p>{this.state.errorMessage}</p>
@@ -151,17 +170,29 @@ class SearchForm extends Component {
 		});
 	}
 
-	handleCheckboxChange(e) {
+	handleBooleanCheckboxChange(e) {
+		let target = e.target.name;
+		this.setState(prevState => ({
+			//set the state to be the opposite of what it was before
+			[target]: !prevState[target]
+		}));
+	}
+
+	handleEventTypeCheckboxChange(e) {
 		const event_types = this.state.event_types;
-		let index;
+		let newEventTypes;
 
 		if (e.target.checked) {
-			event_types.push(e.target.value);
+			newEventTypes = update(event_types, {
+				$push: [e.target.value]
+			});
 		} else {
-			index = event_types.indexOf(e.target.value);
-			event_types.splice(index, 1);
+			const index = event_types.indexOf(e.target.value);
+			newEventTypes = update(this.state.event_types, {
+				$splice: [[index, 1]]
+			});
 		}
-		this.setState({ event_types: event_types });
+		this.setState({ event_types: newEventTypes });
 	}
 
 	handleFormSubmit(e) {
@@ -177,7 +208,9 @@ class SearchForm extends Component {
 			this.state.locality,
 			this.state.postal_code,
 			this.state.thoroughfare,
-			JSON.stringify(this.state.event_types).replace(/"([^"]+(?="))"/g, '$1')
+			//convert the event types array into a string and remove double quotes around items
+			JSON.stringify(this.state.event_types).replace(/"([^"]+(?="))"/g, '$1'),
+			this.state.series
 		];
 		args.forEach((arg, i) => {
 			args[i] = arg === undefined ? '' : arg;
@@ -200,7 +233,9 @@ class SearchForm extends Component {
 				'&thoroughfare=' +
 				args[7] +
 				'&event_types=' +
-				args[8]
+				args[8] +
+				'&series=' +
+				args[9]
 		);
 	}
 }

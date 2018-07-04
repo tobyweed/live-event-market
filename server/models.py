@@ -1,5 +1,5 @@
 from database import Base, db_session
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
@@ -47,6 +47,7 @@ class EventSchema(Schema):
 class EventInfoSchema(Schema):
     id = fields.Integer()
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    series = fields.Bool(missing=False)
     events = fields.Nested(EventSchema, many=True)
     event_types = fields.Nested(EventTypeSchema, many=True, missing=[{}])
     promoter_name = fields.Str()
@@ -68,6 +69,8 @@ There is another one to many join for event types, and another for images.
 '''
 class Location(Base):
     __tablename__ = 'Location'
+    __table_args__ = {'extend_existing': True}
+
     id = Column(Integer, primary_key=True)
     event_id = Column(Integer, ForeignKey('event.id'))
 
@@ -81,6 +84,7 @@ class Location(Base):
 
 class EventType(Base):
     __tablename__ = 'event_type'
+    __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key = True)
     event_info_id = Column(Integer, ForeignKey('event_info.id'))
@@ -116,12 +120,12 @@ class EventInfo(Base):
 
     id = Column(Integer, primary_key = True)
     name = Column(String(120), nullable = False)
+    series = Column(Boolean, default=False)
     promoter_name = Column(String(120), ForeignKey('promoters.name'))
 
     event_types = relationship("EventType", order_by=EventType.id, back_populates="event_info")
     events = relationship("Event", order_by=Event.id, back_populates="event_info")
     promoter = relationship("PromoterModel", back_populates="event_infos")
-    #event type
     #event images
 
     def save_to_db(self):
@@ -138,7 +142,7 @@ class EventInfo(Base):
 
     @classmethod
     # def search(cls,name,start_date,end_date,country_code,administrative_area,locality,postal_code,thoroughfare):
-    def search(cls,name,start_date,end_date,location,event_types):
+    def search(cls,name,start_date,end_date,location,event_types,series):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         #names: returns a list of events with similar names
 
@@ -166,6 +170,9 @@ class EventInfo(Base):
             for type in event_types:
                 search = search.filter(EventInfo.event_types.any(EventType.type == type))
         #series, ticketed, private: boolean values, exact
+        if series == True:
+            search = search.filter(EventInfo.series.is_(True))
+
         return search.with_entities(EventInfo.id).distinct().all() #return only ids, not whole objects. Distinct avoids duplicates
 
 

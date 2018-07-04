@@ -5,8 +5,8 @@
 	display: grid;
 	grid-template-areas: 'video intro' 'video form';
 	grid-template-columns: 50% 50%;
-	grid-template-rows: 50% 50%;
-	height: 75vh;
+	grid-template-rows: 35% 65%;
+	height: 90vh;
 	margin: 0;
 	padding: 0;
 	width: 100%;
