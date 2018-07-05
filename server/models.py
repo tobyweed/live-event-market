@@ -158,13 +158,13 @@ class EventInfo(Base):
         if location['country_code']:
             search = search.filter(EventInfo.events.any(Event.location.has(Location.country_code == location['country_code'])))
             if location['administrative_area']:
-                search = search.filter(EventInfo.events.any(Event.location.has(Location.administrative_area == location['administrative_area'])))
+                search = search.filter(EventInfo.events.any(Event.location.has(Location.administrative_area.ilike('%'+location['administrative_area']+'%'))))
                 if location['locality']:
-                    search = search.filter(EventInfo.events.any(Event.location.has(Location.locality == location['locality'])))
+                    search = search.filter(EventInfo.events.any(Event.location.has(Location.locality.ilike('%'+location['locality']+'%'))))
                     if location['postal_code']:
                         search = search.filter(EventInfo.events.any(Event.location.has(Location.postal_code == location['postal_code'])))
                         if location['thoroughfare']:
-                            search = search.filter(EventInfo.events.any(Event.location.has(Location.thoroughfare == location['thoroughfare'])))
+                            search = search.filter(EventInfo.events.any(Event.location.has(Location.thoroughfare.ilike('%'+location['thoroughfare']+'%'))))
         #types: Compares the query list to the event list. Exact
         if event_types[0]:
             for type in event_types:
