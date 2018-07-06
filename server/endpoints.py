@@ -33,9 +33,13 @@ class SearchEvents(Resource):
             "thoroughfare": args['thoroughfare']
         }
         event_types = args['event_types'][1:-1].split(','); #remove braces and parentheses and split the string into an array by commas
-        series = True if args['series'] == 'true' else False #convert string 'true' or 'false' to boolean value
+        #convert string 'true' or 'false' to boolean value for boolean fields. If the value is neither 'true' or 'false', just enter None.
+        series = True if args['series'] == 'true' else (False if args['series'] == 'false' else None)
+        print(series)
+        ticketed = True if args['ticketed'] == 'true' else (False if args['ticketed'] == 'false' else None)
+        private = True if args['private'] == 'true' else (False if args['private'] == 'false' else None)
         #get list of event_info ids of event_infos matching the search query
-        event_ids = EventInfo.search(name,start_date,end_date,location,event_types,series)
+        event_ids = EventInfo.search(name,start_date,end_date,location,event_types,series,ticketed,private)
         if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
 
@@ -94,7 +98,9 @@ class CreateEvent(Resource):
         print(event_info.errors) #for debugging
         new_event_info = EventInfo(
             name = event_info.data['name'],
-            series = event_info.data['series']
+            series = event_info.data['series'],
+            ticketed = event_info.data['ticketed'],
+            private = event_info.data['private']
         )
 
         # create associated event(s) out of nested object(s), single if single plural else

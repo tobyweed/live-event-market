@@ -4,6 +4,7 @@ import qs from 'qs';
 import update from 'immutability-helper';
 
 import CountrySelector from '../Events/CountrySelector';
+import BooleanFilter from './BooleanFilter';
 
 class SearchForm extends Component {
 	constructor(props) {
@@ -11,7 +12,20 @@ class SearchForm extends Component {
 
 		this.state = {
 			errorMessage: '',
-			event_types: []
+			event_types: [],
+			showFilters: false,
+			series: {
+				use: false, //to tell whether to use this filter
+				term: '' //the value of the filter for the search (true or false when used)
+			},
+			ticketed: {
+				use: false, //to tell whether to use this filter
+				term: '' //the value of the filter for the search (true or false when used)
+			},
+			private: {
+				use: false, //to tell whether to use this filter
+				term: '' //the value of the filter for the search (true or false when used)
+			}
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -22,6 +36,9 @@ class SearchForm extends Component {
 			this
 		);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
+		this.showFilters = this.showFilters.bind(this);
+		this.useFilter = this.useFilter.bind(this);
+		this.getNumOfActiveFilters = this.getNumOfActiveFilters.bind(this);
 	}
 
 	componentDidMount() {
@@ -36,8 +53,22 @@ class SearchForm extends Component {
 			} else {
 				event_types = [];
 			}
-			//If the querystring series says "true", then set "series" to true
-			let isSeries = initialSearch.series === 'true';
+
+			//For each of the boolean filters, If the querystring series says "true", then set series.term to true.
+			//Otherwise set it to false
+			const boolFilters = ['series', 'ticketed', 'private'];
+			let is = {};
+			let use = {};
+			boolFilters.forEach(filter => {
+				is[filter] =
+					initialSearch[filter] === 'true'
+						? true
+						: initialSearch[filter] === 'false' ? false : '';
+
+				//check whether to initialize use[filter] to true or false based on whether is[filter] has a value
+				use[filter] = is[filter] !== '';
+			});
+
 			//prepopulate state with values from the query string, for the form to use to populate itself
 			if (initialSearch) {
 				this.setState({
@@ -49,7 +80,18 @@ class SearchForm extends Component {
 					postal_code: initialSearch.postal_code,
 					thoroughfare: initialSearch.thoroughfare,
 					event_types: event_types,
-					series: isSeries
+					series: {
+						term: is['series'],
+						use: use['series']
+					},
+					ticketed: {
+						term: is['ticketed'],
+						use: use['ticketed']
+					},
+					private: {
+						term: is['private'],
+						use: use['private']
+					}
 				});
 			}
 		}
@@ -150,12 +192,54 @@ class SearchForm extends Component {
 						onChange={this.handleEventTypeCheckboxChange}
 					/>Conferences<br />
 					<h6>Other:</h6>
-					<input
-						type="checkbox"
-						name="series"
-						checked={this.state.series}
-						onChange={this.handleBooleanCheckboxChange}
-					/>Series
+					<button onClick={this.showFilters}>Show More Filters</button>
+					<span>
+						There are currently{' '}
+						{this.getNumOfActiveFilters([
+							this.state.series,
+							this.state.ticketed,
+							this.state.private
+						])}{' '}
+						active filters
+					</span>
+					{this.state.showFilters ? (
+						<div>
+							<ul>
+								<li>
+									<BooleanFilter
+										filterName="series"
+										filter={this.state.series}
+										useFilter={this.useFilter('series')}
+										handleBooleanCheckboxChange={
+											this.handleBooleanCheckboxChange
+										}
+									/>
+								</li>
+								<li>
+									<BooleanFilter
+										filterName="ticketed"
+										filter={this.state.ticketed}
+										useFilter={this.useFilter('ticketed')}
+										handleBooleanCheckboxChange={
+											this.handleBooleanCheckboxChange
+										}
+									/>
+								</li>
+								<li>
+									<BooleanFilter
+										filterName="private"
+										filter={this.state.private}
+										useFilter={this.useFilter('private')}
+										handleBooleanCheckboxChange={
+											this.handleBooleanCheckboxChange
+										}
+									/>
+								</li>
+							</ul>
+						</div>
+					) : (
+						''
+					)}
 					<br />
 					<input type="submit" value="Search" />
 				</form>
@@ -163,6 +247,34 @@ class SearchForm extends Component {
 			</div>
 		);
 	}
+
+	getNumOfActiveFilters(filters) {
+		let numOfActiveFilters = 0;
+		filters.forEach(filter => {
+			if (filter.use) {
+				numOfActiveFilters++;
+			}
+		});
+		return numOfActiveFilters;
+	}
+
+	showFilters(e) {
+		e.preventDefault();
+		this.setState(prevState => ({ showFilters: !prevState.showFilters }));
+	}
+
+	useFilter = filter => e => {
+		e.preventDefault();
+		let term;
+		//switch the value of filter.use, and make term an empty string if we are switching from use to not use
+		this.state[filter]['use'] ? (term = '') : (term = false);
+		this.setState(prevState => ({
+			[filter]: {
+				term: term,
+				use: !prevState[filter]['use']
+			}
+		}));
+	};
 
 	//bind state to inputs
 	handleChange(e) {
@@ -173,16 +285,23 @@ class SearchForm extends Component {
 
 	handleBooleanCheckboxChange(e) {
 		let target = e.target.name;
-		this.setState(prevState => ({
-			//set the state to be the opposite of what it was before
-			[target]: !prevState[target]
-		}));
+		//switch the value of the term as long as we are using the filter
+		if (this.state[target]['use']) {
+			this.setState(prevState => ({
+				[target]: {
+					...prevState[target],
+					term: !prevState[target]['term']
+				}
+			}));
+		}
 	}
 
 	handleEventTypeCheckboxChange(e) {
 		const event_types = this.state.event_types;
 		let newEventTypes;
 
+		//If the checkbox is now checked, add that type to the event_types in state for searching.
+		//Otherwise, remove that event type from the state.
 		if (e.target.checked) {
 			newEventTypes = update(event_types, {
 				$push: [e.target.value]
@@ -197,9 +316,13 @@ class SearchForm extends Component {
 	}
 
 	handleFormSubmit(e) {
+		//check whether the boolean filters should be used or not
+		const series = this.state.series.use ? this.state.series.term : '';
+		const ticketed = this.state.ticketed.use ? this.state.ticketed.term : '';
+		const isPrivate = this.state.private.use ? this.state.private.term : ''; //is isPrivate because private is a reserved word
+
 		//Login on form submit
 		e.preventDefault();
-		//convert undefined attributes into empty strings for the search
 		var args = [
 			this.state.searchName,
 			this.state.start_date,
@@ -211,11 +334,17 @@ class SearchForm extends Component {
 			this.state.thoroughfare,
 			//convert the event types array into a string and remove double quotes around items
 			JSON.stringify(this.state.event_types).replace(/"([^"]+(?="))"/g, '$1'),
-			this.state.series
+			series,
+			ticketed,
+			isPrivate
 		];
+
+		//convert undefined attributes into empty strings for the search
 		args.forEach((arg, i) => {
 			args[i] = arg === undefined ? '' : arg;
 		});
+
+		//Add the search terms to our url
 		this.props.history.push(
 			'/search-results?name=' +
 				args[0] +
@@ -236,7 +365,11 @@ class SearchForm extends Component {
 				'&event_types=' +
 				args[8] +
 				'&series=' +
-				args[9]
+				args[9] +
+				'&ticketed=' +
+				args[10] +
+				'&private=' +
+				args[11]
 		);
 	}
 }

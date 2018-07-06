@@ -23,7 +23,11 @@ export function search(query) {
 					'&event_types=' +
 					query.event_types +
 					'&series=' +
-					query.series
+					query.series +
+					'&ticketed=' +
+					query.ticketed +
+					'&private=' +
+					query.private
 			)
 			.then(res => {
 				resolve(res);

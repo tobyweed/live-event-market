@@ -48,6 +48,9 @@ class EventInfoSchema(Schema):
     id = fields.Integer()
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
     series = fields.Bool(missing=False)
+    ticketed = fields.Bool(missing=False)
+    private = fields.Bool(missing=False)
+    #relationships
     events = fields.Nested(EventSchema, many=True)
     event_types = fields.Nested(EventTypeSchema, many=True, missing=[{}])
     promoter_name = fields.Str()
@@ -121,6 +124,8 @@ class EventInfo(Base):
     id = Column(Integer, primary_key = True)
     name = Column(String(120), nullable = False)
     series = Column(Boolean, default=False)
+    ticketed = Column(Boolean, default=False)
+    private = Column(Boolean, default=False)
     promoter_name = Column(String(120), ForeignKey('promoters.name'))
 
     event_types = relationship("EventType", order_by=EventType.id, back_populates="event_info")
@@ -141,12 +146,10 @@ class EventInfo(Base):
         return cls.query.filter_by(id = id).first()
 
     @classmethod
-    # def search(cls,name,start_date,end_date,country_code,administrative_area,locality,postal_code,thoroughfare):
-    def search(cls,name,start_date,end_date,location,event_types,series):
+    def search(cls,name,start_date,end_date,location,event_types,series,ticketed,private):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
-        #names: returns a list of events with similar names
-
         search = EventInfo.query
+        #name: returns a list of events with similar names
         if name:
             search = search.filter(EventInfo.name.ilike('%'+name+'%'))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
@@ -169,9 +172,15 @@ class EventInfo(Base):
         if event_types[0]:
             for type in event_types:
                 search = search.filter(EventInfo.event_types.any(EventType.type == type))
-        #series, ticketed, private: boolean values, exact
-        if series == True:
-            search = search.filter(EventInfo.series.is_(True))
+        #series, ticketed, private: boolean values, exact. Only filter if the value exists, otherwise ignore.
+        #This means that null strings can be skipped
+        if series != None:
+            print(series)
+            search = search.filter(EventInfo.series.is_(series))
+        if ticketed:
+            search = search.filter(EventInfo.ticketed.is_(True))
+        if private:
+            search = search.filter(EventInfo.private.is_(True))
 
         return search.with_entities(EventInfo.id).distinct().all() #return only ids, not whole objects. Distinct avoids duplicates
 

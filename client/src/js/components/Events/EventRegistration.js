@@ -193,7 +193,7 @@ class EventRegistration extends Component {
 
 	handleAddEvent(e) {
 		let newEvents = update(this.state.events, {
-			$push: [{ start_date: '', end_date: '' }]
+			$push: [{ start_date: '', end_date: '', location: {} }]
 		});
 		this.setState({ events: newEvents });
 	}
