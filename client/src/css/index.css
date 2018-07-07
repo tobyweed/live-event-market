@@ -19,6 +19,10 @@ h6 {
 	-webkit-margin-before: 0.3em;
 	-webkit-margin-after: 0.3em;
 }
+textarea {
+	width: 400px;
+	height: 80px;
+}
 
 .search-form span {
 	font-size: 0.5em;

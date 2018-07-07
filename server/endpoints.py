@@ -22,7 +22,7 @@ event_schema = EventSchema()
 class SearchEvents(Resource):
     def get(self):
         args = request.args
-        name = args['name']
+        text = args['text']
         start_date = args['start_date']
         end_date = args['end_date']
         location = {
@@ -35,11 +35,10 @@ class SearchEvents(Resource):
         event_types = args['event_types'][1:-1].split(','); #remove braces and parentheses and split the string into an array by commas
         #convert string 'true' or 'false' to boolean value for boolean fields. If the value is neither 'true' or 'false', just enter None.
         series = True if args['series'] == 'true' else (False if args['series'] == 'false' else None)
-        print(series)
         ticketed = True if args['ticketed'] == 'true' else (False if args['ticketed'] == 'false' else None)
         private = True if args['private'] == 'true' else (False if args['private'] == 'false' else None)
         #get list of event_info ids of event_infos matching the search query
-        event_ids = EventInfo.search(name,start_date,end_date,location,event_types,series,ticketed,private)
+        event_ids = EventInfo.search(text,start_date,end_date,location,event_types,series,ticketed,private)
         if not event_ids:
             return {'message':'There are no events matching that description. Please try something else.'}
 
@@ -98,6 +97,7 @@ class CreateEvent(Resource):
         print(event_info.errors) #for debugging
         new_event_info = EventInfo(
             name = event_info.data['name'],
+            description = event_info.data['description'],
             series = event_info.data['series'],
             ticketed = event_info.data['ticketed'],
             private = event_info.data['private']

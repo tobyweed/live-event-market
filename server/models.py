@@ -1,5 +1,5 @@
 from database import Base, db_session
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, or_
 from sqlalchemy.orm import relationship
 from passlib.hash import pbkdf2_sha256 as sha256
 from marshmallow import Schema, fields
@@ -47,6 +47,7 @@ class EventSchema(Schema):
 class EventInfoSchema(Schema):
     id = fields.Integer()
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
+    description = fields.Str(missing='This event has no description.')
     series = fields.Bool(missing=False)
     ticketed = fields.Bool(missing=False)
     private = fields.Bool(missing=False)
@@ -123,6 +124,7 @@ class EventInfo(Base):
 
     id = Column(Integer, primary_key = True)
     name = Column(String(120), nullable = False)
+    description = Column(String())
     series = Column(Boolean, default=False)
     ticketed = Column(Boolean, default=False)
     private = Column(Boolean, default=False)
@@ -146,12 +148,12 @@ class EventInfo(Base):
         return cls.query.filter_by(id = id).first()
 
     @classmethod
-    def search(cls,name,start_date,end_date,location,event_types,series,ticketed,private):
+    def search(cls,text,start_date,end_date,location,event_types,series,ticketed,private):
         #return results based on names, dates, locations, types, and/or whether series, ticketed, and/or private. None of the fields are required.
         search = EventInfo.query
         #name: returns a list of events with similar names
-        if name:
-            search = search.filter(EventInfo.name.ilike('%'+name+'%'))
+        if text:
+            search = search.filter(or_(EventInfo.name.ilike('%'+text+'%'), EventInfo.description.ilike('%'+text+'%')))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
             search = search.filter(EventInfo.events.any(Event.start_date >= start_date))

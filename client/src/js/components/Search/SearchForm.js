@@ -72,7 +72,7 @@ class SearchForm extends Component {
 			//prepopulate state with values from the query string, for the form to use to populate itself
 			if (initialSearch) {
 				this.setState({
-					searchName: initialSearch.name,
+					searchText: initialSearch.text,
 					start_date: initialSearch.start_date,
 					country_code: initialSearch.country_code,
 					administrative_area: initialSearch.administrative_area,
@@ -101,11 +101,11 @@ class SearchForm extends Component {
 		return (
 			<div>
 				<form onSubmit={this.handleFormSubmit} className="search-form">
-					<h6>Search by Name:</h6>
+					<h6>Search by Name/Description:</h6>
 					<input
 						placeholder="Search Events"
-						value={this.state.searchName}
-						name="searchName"
+						value={this.state.searchText}
+						name="searchText"
 						type="text"
 						onChange={this.handleChange}
 					/>
@@ -324,7 +324,7 @@ class SearchForm extends Component {
 		//Login on form submit
 		e.preventDefault();
 		var args = [
-			this.state.searchName,
+			this.state.searchText,
 			this.state.start_date,
 			this.state.end_date,
 			this.state.country_code,
@@ -346,7 +346,7 @@ class SearchForm extends Component {
 
 		//Add the search terms to our url
 		this.props.history.push(
-			'/search-results?name=' +
+			'/search-results?text=' +
 				args[0] +
 				'&start_date=' +
 				args[1] +

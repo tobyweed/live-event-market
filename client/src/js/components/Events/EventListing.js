@@ -90,6 +90,7 @@ class AccountEvents extends Component {
 				) : (
 					''
 				)}
+				<div>Description: {eventInfo.description}</div>
 			</div>
 		) : (
 			<span>

@@ -115,7 +115,17 @@ class EventRegistration extends Component {
 						name="event_types[]"
 						value="Conferences"
 						onChange={this.handleEventTypeCheckboxChange}
-					/>Conferences<br />
+					/>Conferences
+					<br />
+					<h5>Description:</h5>
+					<br />
+					<textarea
+						className="form-item"
+						placeholder="Enter a Description of This Event"
+						name="description"
+						onChange={this.handleChange}
+					/>
+					<br />
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
 				{this.state.errorMessage}
@@ -207,7 +217,8 @@ class EventRegistration extends Component {
 				name: this.state.name,
 				series: this.state.series,
 				events: this.state.events,
-				event_types: this.state.event_types
+				event_types: this.state.event_types,
+				description: this.state.description
 			})
 			.then(res => {
 				//if we get data in our response and that data is an array, then add that data to state

@@ -4,8 +4,8 @@ export function search(query) {
 	return new Promise((resolve, reject) => {
 		axios
 			.get(
-				'/search-events?name=' +
-					query.name +
+				'/search-events?text=' +
+					query.text +
 					'&start_date=' +
 					query.start_date +
 					'&end_date=' +
