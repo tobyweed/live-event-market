@@ -12,10 +12,10 @@ class EventRegistration extends Component {
 		super();
 		this.handleChange = this.handleChange.bind(this);
 		this.handleFormSubmit = this.handleFormSubmit.bind(this);
-		this.handleEventChange = this.handleEventChange.bind(this);
+		this.handleNestedChange = this.handleNestedChange.bind(this);
 		this.handleEventLocationChange = this.handleEventLocationChange.bind(this);
-		this.handleAddEvent = this.handleAddEvent.bind(this);
-		this.handleRemoveEvent = this.handleRemoveEvent.bind(this);
+		this.handleAddNested = this.handleAddNested.bind(this);
+		this.handleRemoveNested = this.handleRemoveNested.bind(this);
 		this.handleBooleanCheckboxChange = this.handleBooleanCheckboxChange.bind(
 			this
 		);
@@ -29,6 +29,7 @@ class EventRegistration extends Component {
 	state = {
 		errorMessage: '',
 		events: [{ start_date: '', end_date: '', location: {} }],
+		event_images: [{ img: '', description: '' }],
 		event_types: []
 	};
 
@@ -67,18 +68,24 @@ class EventRegistration extends Component {
 								{this.state.events.map((event, i) => (
 									<li key={i}>
 										<NestedEventRegistration
-											onChange={this.handleEventChange(i)}
+											onChange={this.handleNestedChange(i, 'events')}
 											onLocationChange={this.handleEventLocationChange(i)}
 										/>
 									</li>
 								))}
 								<li>
 									Add or Remove an Event:
-									<button type="button" onClick={this.handleAddEvent}>
+									<button
+										type="button"
+										onClick={this.handleAddNested('events')}
+									>
 										+
 									</button>
 									/
-									<button type="button" onClick={this.handleRemoveEvent}>
+									<button
+										type="button"
+										onClick={this.handleRemoveNested('events')}
+									>
 										-
 									</button>
 								</li>
@@ -86,7 +93,7 @@ class EventRegistration extends Component {
 						</div>
 					) : (
 						<NestedEventRegistration
-							onChange={this.handleEventChange(0)}
+							onChange={this.handleNestedChange(0, 'events')}
 							onLocationChange={this.handleEventLocationChange(0)}
 						/>
 					)}
@@ -126,6 +133,56 @@ class EventRegistration extends Component {
 						onChange={this.handleChange}
 					/>
 					<br />
+					<h5>Profile Picture:</h5>
+					<br />
+					<input
+						className="form-item"
+						placeholder="Enter an Image Url"
+						name="proPicUrl"
+						type="text"
+						onChange={this.handleChange}
+					/>
+					<br />
+					<div>
+						<br />
+						<h5>Images: </h5>
+						<ul>
+							{this.state.event_images.map((image, i) => (
+								<li key={i}>
+									<label htmlFor="img">Image URL: </label>
+									<input
+										placeholder="Enter URL"
+										name="img"
+										type="text"
+										onChange={this.handleNestedChange(i, 'event_images')}
+									/>
+									<label htmlFor="description">Image Description: </label>
+									<input
+										placeholder="Enter Description"
+										name="description"
+										type="text"
+										onChange={this.handleNestedChange(i, 'event_images')}
+									/>
+								</li>
+							))}
+							<li>
+								Add or Remove an Image:
+								<button
+									type="button"
+									onClick={this.handleAddNested('event_images')}
+								>
+									+
+								</button>
+								/
+								<button
+									type="button"
+									onClick={this.handleRemoveNested('event_images')}
+								>
+									-
+								</button>
+							</li>
+						</ul>
+					</div>
 					<input className="form-submit" value="Submit" type="submit" />
 				</form>
 				{this.state.errorMessage}
@@ -139,6 +196,7 @@ class EventRegistration extends Component {
 		});
 	}
 
+	//==============Types & Booleans==============
 	handleBooleanCheckboxChange(e) {
 		let target = e.target.name;
 		//If we are checking or unchecking series, then remove all but one event
@@ -170,14 +228,15 @@ class EventRegistration extends Component {
 		this.setState({ event_types: event_types });
 	}
 
-	handleEventChange = i => e => {
-		let newEvents = update(this.state.events, {
+	//==============Nested Events & Images==============
+	handleNestedChange = (i, target) => e => {
+		let newArray = update(this.state[target], {
 			[i]: {
 				[e.target.name]: { $set: e.target.value }
 			}
 		});
 		this.setState({
-			events: newEvents
+			[target]: newArray
 		});
 	};
 
@@ -194,20 +253,21 @@ class EventRegistration extends Component {
 		});
 	};
 
-	handleRemoveEvent(e) {
-		let newEvents = update(this.state.events, {
-			$splice: [[0, 1]]
+	handleRemoveNested = target => e => {
+		let newArray = update(this.state[target], {
+			$splice: [[-1, 1]]
 		});
-		this.setState({ events: newEvents });
-	}
+		this.setState({ [target]: newArray });
+	};
 
-	handleAddEvent(e) {
-		let newEvents = update(this.state.events, {
+	handleAddNested = target => e => {
+		let newArray = update(this.state[target], {
 			$push: [{ start_date: '', end_date: '', location: {} }]
 		});
-		this.setState({ events: newEvents });
-	}
+		this.setState({ [target]: newArray });
+	};
 
+	//==============Submit==============
 	handleFormSubmit(e) {
 		//Login on form submit
 		e.preventDefault();
@@ -217,8 +277,10 @@ class EventRegistration extends Component {
 				name: this.state.name,
 				series: this.state.series,
 				events: this.state.events,
+				event_images: this.state.event_images,
 				event_types: this.state.event_types,
-				description: this.state.description
+				description: this.state.description,
+				pro_pic_url: this.state.proPicUrl
 			})
 			.then(res => {
 				//if we get data in our response and that data is an array, then add that data to state

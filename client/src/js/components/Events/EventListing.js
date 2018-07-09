@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
+import blank_prof from '../../../images/blank_prof.png';
+
 class AccountEvents extends Component {
 	state = {
 		eventInfo: ''
@@ -23,6 +25,8 @@ class AccountEvents extends Component {
 		return eventInfo ? (
 			<div>
 				<h4>{eventInfo.name}</h4>
+				Created by Promoter: {eventInfo.promoter_name}
+				<br />
 				Series: {eventInfo.series ? <span>Yes.</span> : <span>No.</span>}
 				<br />
 				Dates & Locations:
@@ -90,7 +94,75 @@ class AccountEvents extends Component {
 				) : (
 					''
 				)}
-				<div>Description: {eventInfo.description}</div>
+				<div>
+					{eventInfo.description ? (
+						<div>Description: {eventInfo.description}</div>
+					) : (
+						''
+					)}
+				</div>
+				{eventInfo.pro_pic_url ? (
+					<div>
+						Profile Picture:
+						<div className="event-pro-pic">
+							{eventInfo.pro_pic_url ? (
+								<img
+									src={eventInfo.pro_pic_url}
+									onError={e => {
+										e.target.src =
+											'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+									}}
+									alt="Profile"
+								/>
+							) : (
+								<img
+									src={
+										'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+									}
+									alt="blank profile icon"
+								/>
+							)}
+						</div>
+					</div>
+				) : (
+					''
+				)}
+				{eventInfo.event_images[0] ? (
+					<div>
+						Pictures:
+						<br />
+						{eventInfo.event_images.map(function(eventImage, i) {
+							return (
+								<div key={i} className="event-image">
+									{eventImage.img ? (
+										<img
+											src={eventImage.img}
+											onError={e => {
+												e.target.src =
+													'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+											}}
+											alt="User"
+										/>
+									) : (
+										<img
+											src={
+												'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'
+											}
+											alt="blank profile icon"
+										/>
+									)}
+									{eventImage.description ? (
+										<span>{eventImage.description}</span>
+									) : (
+										''
+									)}
+								</div>
+							);
+						})}
+					</div>
+				) : (
+					''
+				)}
 			</div>
 		) : (
 			<span>

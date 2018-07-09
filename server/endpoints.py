@@ -5,7 +5,7 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 import json
 from dateutil import parser
 
-from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, EventType, Location, UserSchema, UserSchemaWithoutPass, PromoterSchema, LocationSchema, EventSchema, EventInfoSchema, EventTypeSchema)
+from models import (PromoterModel, UserModel, RevokedTokenModel, Event, EventInfo, EventType, EventImage, Location, UserSchema, UserSchemaWithoutPass, PromoterSchema, LocationSchema, EventSchema, EventInfoSchema, EventTypeSchema, EventImageSchema)
 from database import db_session
 #initialize schemas
 user_schema = UserSchema()
@@ -97,6 +97,7 @@ class CreateEvent(Resource):
         print(event_info.errors) #for debugging
         new_event_info = EventInfo(
             name = event_info.data['name'],
+            pro_pic_url = event_info.data['pro_pic_url'],
             description = event_info.data['description'],
             series = event_info.data['series'],
             ticketed = event_info.data['ticketed'],
@@ -121,7 +122,7 @@ class CreateEvent(Resource):
             # append created Events to created event_info
             new_event_info.events.append(new_event)
 
-        # create associated event(s) out of nested object(s), single if single plural else
+        # create associated event type(s) out of nested object(s), single if single plural else
         event_types = event_info.data['event_types']
         for i in range(len(event_types)):
             new_event_type = EventType(
@@ -129,6 +130,16 @@ class CreateEvent(Resource):
             )
             # append created Events to created event_info
             new_event_info.event_types.append(new_event_type)
+
+        # create associated event image(s) out of nested object(s), single if single plural else
+        event_images = event_info.data['event_images']
+        for i in range(len(event_images)):
+            new_event_image = EventImage(
+                img = event_images[i]['img'],
+                description = event_images[i]['description']
+            )
+            # append created Events to created event_info
+            new_event_info.event_images.append(new_event_image)
 
         # append create event_info to promoter of current user
         promoter = PromoterModel.find_by_name(current_user_promoter)

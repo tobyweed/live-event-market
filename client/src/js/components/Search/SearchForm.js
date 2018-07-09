@@ -101,7 +101,7 @@ class SearchForm extends Component {
 		return (
 			<div>
 				<form onSubmit={this.handleFormSubmit} className="search-form">
-					<h6>Search by Name/Description:</h6>
+					<h6>Search by Name/Promoter Name/Description:</h6>
 					<input
 						placeholder="Search Events"
 						value={this.state.searchText}

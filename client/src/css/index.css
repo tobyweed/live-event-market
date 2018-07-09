@@ -27,6 +27,31 @@ textarea {
 .search-form span {
 	font-size: 0.5em;
 }
+
+.event-pro-pic {
+	width: 25vh;
+	height: 25vh;
+	overflow: hidden;
+}
+.event-pro-pic img {
+	height: 25vh;
+	width: auto;
+	padding: 2vh 0;
+}
+
+.event-image {
+	width: 25vh;
+	height: 25vh;
+	padding: 0 10px 30px 10px;
+	display: inline-block;
+	overflow: hidden;
+}
+
+.event-image img {
+	height: 25vh;
+	width: auto;
+	padding: 0.1vh 0;
+}
 /* Styling Library */
 .button_plain {
 	background-color: #222;

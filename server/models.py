@@ -34,6 +34,10 @@ class LocationSchema(Schema):
     postal_code = fields.Str(missing=None)
     thoroughfare = fields.Str(missing=None)
 
+class EventImageSchema(Schema):
+    img = fields.Str(missing=None)
+    description = fields.Str(missing=None)
+
 class EventTypeSchema(Schema):
     type = fields.Str(missing=None)
     event_name = fields.Str()
@@ -47,13 +51,15 @@ class EventSchema(Schema):
 class EventInfoSchema(Schema):
     id = fields.Integer()
     name = fields.Str(error_messages = {'required':'This field cannot be left blank'}, required = True)
-    description = fields.Str(missing='This event has no description.')
+    pro_pic_url = fields.Str(missing=None)
+    description = fields.Str(missing=None)
     series = fields.Bool(missing=False)
     ticketed = fields.Bool(missing=False)
     private = fields.Bool(missing=False)
     #relationships
     events = fields.Nested(EventSchema, many=True)
     event_types = fields.Nested(EventTypeSchema, many=True, missing=[{}])
+    event_images = fields.Nested(EventImageSchema, many=True, missing=[{}])
     promoter_name = fields.Str()
 
 class PromoterSchema(Schema):
@@ -71,6 +77,17 @@ another (Event) has all of the date and location info.
 The eventinfo to event relationship is one to many.
 There is another one to many join for event types, and another for images.
 '''
+class EventImage(Base):
+        __tablename__ = 'event_image'
+        __table_args__ = {'extend_existing': True}
+
+        id = Column(Integer, primary_key = True)
+        event_info_id = Column(Integer, ForeignKey('event_info.id'))
+        img = Column(String)
+        description = Column(String())
+
+        event_info = relationship("EventInfo", back_populates="event_images")
+
 class Location(Base):
     __tablename__ = 'Location'
     __table_args__ = {'extend_existing': True}
@@ -124,16 +141,17 @@ class EventInfo(Base):
 
     id = Column(Integer, primary_key = True)
     name = Column(String(120), nullable = False)
+    pro_pic_url = Column(String(120))
     description = Column(String())
     series = Column(Boolean, default=False)
     ticketed = Column(Boolean, default=False)
     private = Column(Boolean, default=False)
     promoter_name = Column(String(120), ForeignKey('promoters.name'))
 
+    event_images = relationship("EventImage", order_by=EventImage.id, back_populates="event_info")
     event_types = relationship("EventType", order_by=EventType.id, back_populates="event_info")
     events = relationship("Event", order_by=Event.id, back_populates="event_info")
     promoter = relationship("PromoterModel", back_populates="event_infos")
-    #event images
 
     def save_to_db(self):
         db_session.add(self)
@@ -153,7 +171,7 @@ class EventInfo(Base):
         search = EventInfo.query
         #name: returns a list of events with similar names
         if text:
-            search = search.filter(or_(EventInfo.name.ilike('%'+text+'%'), EventInfo.description.ilike('%'+text+'%')))
+            search = search.filter(or_(EventInfo.name.ilike('%'+text+'%'), EventInfo.description.ilike('%'+text+'%'), EventInfo.promoter_name.ilike('%'+text+'%')))
         #dates: filter out event_infos with no nested event that has start and end dates which fall within the provided date range
         if start_date:
             search = search.filter(EventInfo.events.any(Event.start_date >= start_date))
