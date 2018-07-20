@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { updatePromoter } from '../../actions.js';
 
-import blank_prof from '../../../images/blank_prof.png';
+class EventListing extends Component {
+	constructor() {
+		super();
 
-class AccountEvents extends Component {
+		this.handleDeleteEvent = this.handleDeleteEvent.bind(this);
+	}
+
 	state = {
 		eventInfo: ''
 	};
@@ -29,62 +35,70 @@ class AccountEvents extends Component {
 				<br />
 				Series: {eventInfo.series ? <span>Yes.</span> : <span>No.</span>}
 				<br />
+				Ticketed: {eventInfo.ticketed ? <span>Yes.</span> : <span>No.</span>}
+				<br />
+				Private: {eventInfo.private ? <span>Yes.</span> : <span>No.</span>}
+				<br />
 				Dates & Locations:
 				<ul>
 					{/* Map eventinfo events array and format each event to be displayed*/}
-					{eventInfo.events.map(function(event, i) {
-						const start_date = new Date(event.start_date);
-						const end_date = new Date(event.end_date);
-						return (
-							<li key={i}>
-								Event {i + 1}
-								<ul>
-									{event.start_date ? (
-										<li>Start Date: {start_date.toString()}</li>
-									) : (
-										''
-									)}
-									{event.end_date ? (
-										<li>End Date: {end_date.toString()}</li>
-									) : (
-										''
-									)}
-									{/* Check if the event has a location attribute and whether that location
+					{!!eventInfo.events
+						? eventInfo.events.map(function(event, i) {
+								const start_date = new Date(event.start_date);
+								const end_date = new Date(event.end_date);
+								return (
+									<li key={i}>
+										Event {i + 1}
+										<ul>
+											{event.start_date ? (
+												<li>Start Date: {start_date.toString()}</li>
+											) : (
+												''
+											)}
+											{event.end_date ? (
+												<li>End Date: {end_date.toString()}</li>
+											) : (
+												''
+											)}
+											{/* Check if the event has a location attribute and whether that location
 										attribute has any non-null values before trying to display it*/}
-									{event.location &&
-									Object.values(event.location).some(el => {
-										return el !== null;
-									}) ? (
-										<li>
-											Location:&nbsp;
-											{event.location.thoroughfare
-												? event.location.thoroughfare
-												: ''}
-											,&nbsp;
-											{event.location.locality ? event.location.locality : ''}
-											&nbsp;
-											{event.location.administrative_area
-												? event.location.administrative_area
-												: ''}
-											&nbsp;
-											{event.location.postal_code
-												? event.location.postal_code
-												: ''}
-											,&nbsp;
-											{event.location.country_code
-												? event.location.country_code
-												: ''}
-											&nbsp;
-										</li>
-									) : (
-										''
-									)}
-								</ul>
-							</li>
-						);
-					})}
+											{event.location &&
+											Object.values(event.location).some(el => {
+												return el !== null;
+											}) ? (
+												<li>
+													Location:&nbsp;
+													{event.location.thoroughfare
+														? event.location.thoroughfare
+														: ''}
+													,&nbsp;
+													{event.location.locality
+														? event.location.locality
+														: ''}
+													&nbsp;
+													{event.location.administrative_area
+														? event.location.administrative_area
+														: ''}
+													&nbsp;
+													{event.location.postal_code
+														? event.location.postal_code
+														: ''}
+													,&nbsp;
+													{event.location.country_code
+														? event.location.country_code
+														: ''}
+													&nbsp;
+												</li>
+											) : (
+												''
+											)}
+										</ul>
+									</li>
+								);
+						  })
+						: ''}
 				</ul>
-				{eventInfo.event_types[0] ? (
+				{!!eventInfo.event_types && eventInfo.event_types[0] ? (
 					<div>
 						Type:
 						{eventInfo.event_types.map(function(event_type, i) {
@@ -127,7 +141,7 @@ class AccountEvents extends Component {
 				) : (
 					''
 				)}
-				{eventInfo.event_images[0] ? (
+				{!!eventInfo.event_images && eventInfo.event_images[0] ? (
 					<div>
 						Pictures:
 						<br />
@@ -163,6 +177,14 @@ class AccountEvents extends Component {
 				) : (
 					''
 				)}
+				{/* Only display the delete button if there is a user, it has the property promoter_name and the promoter_name is the same as the event*/}
+				{!!this.props.userData &&
+				this.props.userData.hasOwnProperty('promoter_name') &&
+				this.props.userData.promoter_name === eventInfo.promoter_name ? (
+					<button onClick={this.handleDeleteEvent}>Delete This Event</button>
+				) : (
+					''
+				)}
 			</div>
 		) : (
 			<span>
@@ -171,6 +193,30 @@ class AccountEvents extends Component {
 			</span>
 		);
 	}
+
+	handleDeleteEvent(e) {
+		e.preventDefault();
+		axios
+			.delete('/event/' + this.state.eventInfo.id)
+			.then(res => {
+				let eventInfos = this.props.promoterData.event_infos;
+				const index = eventInfos.findIndex(eventInfo => {
+					return eventInfo.id === this.state.eventInfo.id;
+				});
+				if (index !== -1) eventInfos.splice(index, 1);
+				this.props.dispatch(updatePromoter('event_infos', eventInfos));
+			})
+			.catch(err => {
+				this.setState({ editFormMessage: err });
+			});
+	}
 }
 
-export default AccountEvents;
+function mapStateToProps(state) {
+	return {
+		promoterData: state.idData.promoterData,
+		userData: state.idData.userData
+	};
+}
+
+export default connect(mapStateToProps)(EventListing);

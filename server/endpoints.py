@@ -1,5 +1,5 @@
 from flask_restful import Resource, request
-from sqlalchemy import update
+from sqlalchemy import update, delete
 from datetime import datetime
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 import json
@@ -54,9 +54,12 @@ class OneEvent(Resource):
     def get(self, id):
         #get the right event_info
         event_info = EventInfo.find_by_id(id)
-        # print(getattr(event,"location"))
+        # ids = []
+        # for event in event_info.events:
+        #     ids.append(event.id)
+        # print(str(id) + " Has: "+str(ids))
         if not event_info:
-            return {'message': 'An event with that id does not exist.'}, 500
+            return {'message': 'An event with that id does not exist.'}
         #serialize event_info
         event_info_dump = event_info_schema.dump(event_info)
 
@@ -65,6 +68,22 @@ class OneEvent(Resource):
             return event_info_dump
         except:
             return {'message': 'Something went wrong.'}, 500
+    @jwt_required
+    def delete(self, id):
+        #get the name of the promoter that we're trying to update
+        event_info = EventInfo.find_by_id(id)
+        if not event_info:
+            return {'message': 'An event with that id does not exist.'}
+        #get the name of the user trying to do the updating
+        current_user_name = get_jwt_identity()
+        user = UserModel.find_by_username(current_user_name)
+        #return a helpful message if the user is trying to edit an account which is not their own
+        if not user.promoter_name == event_info.promoter_name:
+            return {'message': 'That event belongs to another promoter account; you are not authorized to delete it.'}
+
+        db_session.delete(event_info)
+        db_session.commit()
+        return {'message': 'Event #{} was deleted.'.format(id)}
 
 #create a new event
 class CreateEvent(Resource):
@@ -208,9 +227,9 @@ class OneUser(Resource):
 
 
 #this is a development route. Only leaving it here right now as an example of deletion
-# class AllUsers(Resource):
-#     def delete(self):
-#         return UserModel.delete_all()
+class AllEvents(Resource):
+    def delete(self):
+        return EventInfo.delete_all()
 
 
 '''

@@ -86,7 +86,14 @@ class EventImage(Base):
         img = Column(String)
         description = Column(String())
 
-        event_info = relationship("EventInfo", back_populates="event_images")
+        @classmethod
+        def delete_all(cls):
+          try:
+              num_rows_deleted = db_session.query(cls).delete()
+              db_session.commit()
+              return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+          except:
+              return {'message': 'Something went wrong'}
 
 class Location(Base):
     __tablename__ = 'Location'
@@ -101,7 +108,14 @@ class Location(Base):
     postal_code = Column(String(120))
     thoroughfare = Column(String(120)) #street address
 
-    event = relationship("Event", back_populates="location")
+    @classmethod
+    def delete_all(cls):
+      try:
+          num_rows_deleted = db_session.query(cls).delete()
+          db_session.commit()
+          return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+      except:
+          return {'message': 'Something went wrong'}
 
 class EventType(Base):
     __tablename__ = 'event_type'
@@ -112,7 +126,14 @@ class EventType(Base):
 
     type = Column(String(120))
 
-    event_info = relationship("EventInfo", back_populates="event_types")
+    @classmethod
+    def delete_all(cls):
+      try:
+          num_rows_deleted = db_session.query(cls).delete()
+          db_session.commit()
+          return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+      except:
+          return {'message': 'Something went wrong'}
 
 class Event(Base):
     __tablename__ = 'event'
@@ -124,8 +145,7 @@ class Event(Base):
     start_date = Column(DateTime)
     end_date = Column(DateTime)
 
-    event_info = relationship("EventInfo", back_populates="events")
-    location = relationship("Location", uselist=False, back_populates="event")
+    location = relationship("Location", uselist=False, backref="event", cascade="all, delete-orphan")
 
     def save_to_db(self):
         db_session.add(self)
@@ -134,6 +154,15 @@ class Event(Base):
     @classmethod
     def find_by_id(cls, id):
        return cls.query.filter_by(id = id).first()
+
+    @classmethod
+    def delete_all(cls):
+      try:
+          num_rows_deleted = db_session.query(cls).delete()
+          db_session.commit()
+          return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+      except:
+          return {'message': 'Something went wrong'}
 
 class EventInfo(Base):
     __tablename__ = 'event_info'
@@ -146,12 +175,11 @@ class EventInfo(Base):
     series = Column(Boolean, default=False)
     ticketed = Column(Boolean, default=False)
     private = Column(Boolean, default=False)
-    promoter_name = Column(String(120), ForeignKey('promoters.name'))
+    promoter_name = Column(String(120), ForeignKey('promoter.name'))
 
-    event_images = relationship("EventImage", order_by=EventImage.id, back_populates="event_info")
-    event_types = relationship("EventType", order_by=EventType.id, back_populates="event_info")
-    events = relationship("Event", order_by=Event.id, back_populates="event_info")
-    promoter = relationship("PromoterModel", back_populates="event_infos")
+    event_images = relationship("EventImage", order_by=EventImage.id, backref="event_info", cascade="all, delete-orphan")
+    event_types = relationship("EventType", order_by=EventType.id, backref="event_info", cascade="all, delete-orphan")
+    events = relationship("Event", order_by=Event.id, backref="event_info", cascade="all, delete-orphan")
 
     def save_to_db(self):
         db_session.add(self)
@@ -204,11 +232,19 @@ class EventInfo(Base):
 
         return search.with_entities(EventInfo.id).distinct().all() #return only ids, not whole objects. Distinct avoids duplicates
 
+    @classmethod
+    def delete_all(cls):
+        try:
+            num_rows_deleted = db_session.query(cls).delete()
+            db_session.commit()
+            return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+        except:
+            return {'message': 'Something went wrong'}
 
 
 #represents users
 class UserModel(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     __table_args__ = {'extend_existing': True}
 
     id = Column(Integer, primary_key = True)
@@ -220,9 +256,7 @@ class UserModel(Base):
     phoneNumber = Column(String(120))
     proPicUrl = Column(String(120))
     organization = Column(String(120))
-    promoter_name = Column(String(120), ForeignKey('promoters.name'))
-
-    promoter = relationship("PromoterModel", back_populates="users")
+    promoter_name = Column(String(120), ForeignKey('promoter.name'))
 
     def save_to_db(self):
         db_session.add(self)
@@ -260,13 +294,13 @@ class UserModel(Base):
 
 
 class PromoterModel(Base):
-    __tablename__ = 'promoters'
+    __tablename__ = 'promoter'
 
     id = Column(Integer, primary_key = True)
     name = Column(String(120), unique = True, nullable = False)
 
-    users = relationship("UserModel", order_by=UserModel.id, back_populates="promoter")
-    event_infos = relationship("EventInfo", order_by=EventInfo.id, back_populates="promoter")
+    users = relationship("UserModel", order_by=UserModel.id, backref="promoter")
+    event_infos = relationship("EventInfo", order_by=EventInfo.id, backref="promoter")
 
     def save_to_db(self):
         db_session.add(self)
@@ -275,6 +309,15 @@ class PromoterModel(Base):
     @classmethod
     def find_by_name(cls, name):
        return cls.query.filter_by(name = name).first()
+
+    @classmethod
+    def delete_all(cls):
+      try:
+          num_rows_deleted = db_session.query(cls).delete()
+          db_session.commit()
+          return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
+      except:
+          return {'message': 'Something went wrong'}
 
     @classmethod
     def return_all(cls):

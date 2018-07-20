@@ -20,7 +20,6 @@ class AccountEvents extends Component {
 
 	render() {
 		const eventInfos = this.props.promoterData.event_infos;
-
 		return (
 			<div>
 				<h1>Events</h1>

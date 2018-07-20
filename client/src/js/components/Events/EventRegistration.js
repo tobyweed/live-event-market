@@ -47,6 +47,7 @@ class EventRegistration extends Component {
 						name="name"
 						type="text"
 						onChange={this.handleChange}
+						maxLength="120"
 						required
 					/>
 					<br />
@@ -56,6 +57,26 @@ class EventRegistration extends Component {
 					<input
 						className="form-item"
 						name="series"
+						type="checkbox"
+						onChange={this.handleBooleanCheckboxChange}
+					/>
+					<br />
+					<label htmlFor="ticketed">
+						<h5>Ticketed: </h5>
+					</label>
+					<input
+						className="form-item"
+						name="ticketed"
+						type="checkbox"
+						onChange={this.handleBooleanCheckboxChange}
+					/>
+					<br />
+					<label htmlFor="private">
+						<h5>Private: </h5>
+					</label>
+					<input
+						className="form-item"
+						name="private"
 						type="checkbox"
 						onChange={this.handleBooleanCheckboxChange}
 					/>
@@ -139,6 +160,7 @@ class EventRegistration extends Component {
 						className="form-item"
 						placeholder="Enter an Image Url"
 						name="proPicUrl"
+						maxLength="500"
 						type="text"
 						onChange={this.handleChange}
 					/>
@@ -153,6 +175,7 @@ class EventRegistration extends Component {
 									<input
 										placeholder="Enter URL"
 										name="img"
+										maxLength="500"
 										type="text"
 										onChange={this.handleNestedChange(i, 'event_images')}
 									/>
@@ -269,13 +292,14 @@ class EventRegistration extends Component {
 
 	//==============Submit==============
 	handleFormSubmit(e) {
-		//Login on form submit
 		e.preventDefault();
 
 		axios
 			.post('/create-event', {
 				name: this.state.name,
 				series: this.state.series,
+				ticketed: this.state.ticketed,
+				private: this.state.private,
 				events: this.state.events,
 				event_images: this.state.event_images,
 				event_types: this.state.event_types,

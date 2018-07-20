@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import '../../../css/App.css';
 import { connect } from 'react-redux';
 import { setUserData } from '../../actions.js';
 
