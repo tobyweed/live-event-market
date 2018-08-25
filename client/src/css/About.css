@@ -1,0 +1,35 @@
+.about {
+	background-color: #fff;
+	color: #333;
+	display: grid;
+	grid-template-areas: 'about_text about_image';
+	grid-template-columns: 50% 50%;
+	height: 75vh;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.about_text {
+	grid-area: about_text;
+	position: relative;
+}
+.about_text_content {
+	right: 3vh;
+	position: absolute;
+	width: 55vh;
+	padding: 10vh 0;
+}
+.about_image {
+	grid-area: about_image;
+	position: relative;
+}
+.about_image_content {
+	position: absolute;
+	left: 3vh;
+}
+img.about_image_content {
+	height: 55vh;
+	padding: 10vh 0vh;
+	width: 55vh;
+}

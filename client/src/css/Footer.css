@@ -1,0 +1,26 @@
+.footer {
+	background-color: #fff;
+	color: #333;
+	display: grid;
+	grid-template-areas: 'footer_company footer_company footer_links footer_email';
+	grid-template-columns: 25% 25% 20% 30%;
+	height: 30vh;
+	width: 80;
+	margin: 0;
+	padding: 0 10vw;
+}
+.footer a {
+	color: #333;
+}
+.footer_company {
+	grid-area: footer_company;
+	padding: 2vh;
+}
+.footer_links {
+	grid-area: footer_links;
+	padding: 2vh;
+}
+.footer_email {
+	grid-area: footer_email;
+	padding: 2vh;
+}

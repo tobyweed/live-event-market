@@ -1,0 +1,36 @@
+/* Front Page */
+.frontpage {
+	background: linear-gradient(#222, #333, #333, #333, #333, #333, #333, #222);
+	color: #fff;
+	display: grid;
+	grid-template-areas: 'video intro' 'video form';
+	grid-template-columns: 50% 50%;
+	grid-template-rows: 35% 65%;
+	height: 90vh;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+.video {
+	grid-area: video;
+	position: relative;
+}
+.video_content {
+	position: absolute;
+	right: 3vh;
+}
+img.video_content {
+	height: 55vh;
+	padding: 10vh 0vh;
+	width: 55vh;
+}
+.intro {
+	grid-area: intro;
+	position: relative;
+}
+.intro_content {
+	bottom: 0;
+	left: 3vh;
+	position: absolute;
+	width: 55vh;
+}

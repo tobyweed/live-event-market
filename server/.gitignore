@@ -1,17 +1,9 @@
-# dependencies
-node_modules
-
 # environment
 venv
 serverenv
 .env
-whooshee
 sqlite:
-app.db
 test.sqlite
-
-# production
-/build
 
 #misc
 __pycache__
